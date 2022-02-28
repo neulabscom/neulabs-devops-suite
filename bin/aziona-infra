@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+import os
+import subprocess
+
+
+def argsinstance():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-t",
+        "--template",
+        required=True,
+        type=str,
+        help="Template yaml path",
+    )
+    parser.add_argument(
+        'targets', 
+        metavar='targets', 
+        type=str, 
+        nargs='+',
+        help="Target name")
+    return parser
+
+
+def main():
+    if os.getenv("AZIONA_ENABLED", "false") != "true":
+        print("[ERROR] Before activate aziona env")
+        return 1
+    else:
+        print(os.getenv("AZIONA_WELCOME_MESSAGE", ""))
+        
+    args = argsinstance().parse_args()
+
+    template = os.getenv("AZIONA_WORKSPACE_INFRASTRUCTURE") + "/template/" + args.template + ".yml"
+
+    command = "aziona -v -f %s %s" % (template," ".join(args.targets))
+
+    subprocess.check_call(command, shell=True)
+
+if __name__ == "__main__":
+    sys.exit(main())
