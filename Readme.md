@@ -3,7 +3,7 @@
 ### Requirments
 
 1. Python >= 3.8 \[[install](https://www.python.org/downloads/)\]
-    - With: pip3 
+    - With: pip3, python3-venv
 3. VSCode \[[install](https://code.visualstudio.com/download)\]
 4. GitHub CLI \[[install](https://cli.github.com/)\]
 
