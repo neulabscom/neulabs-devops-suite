@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
-import platform
 import sys
 import os
-import getpass
 import datetime
 
 NEULABS_PATH = os.path.join(os.getenv("HOME"), ".neulabs")
@@ -61,13 +59,7 @@ def _configurations():
     with open(ENV["AZIONA_ACTIVE_PERSISTENT_PATH"], "w") as f:
         f.write("")
 
-    confirm = True if input("Add source in .bashrc or/and .zshrc [y,yes or n,no]: ").lower() in ["y","yes"] else False
-
-    if confirm is False:
-        print("Add in shell configurtion file: \n" + RC + "\n")
-        import time
-        time.sleep(1.0)
-        return 0
+    print("Check in .bashrc or/and .zshrc file: \n" + RC + "\n")
 
     bashrc_path = os.getenv("HOME") + "/.bashrc"
     if os.path.isfile(bashrc_path):
