@@ -11,7 +11,7 @@ trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 set -o pipefail
 
 main(){
-    cd tmp
+    cd /tmp
 
     git clone https://github.com/neulabscom/neulabs-devops-suite.git
 
