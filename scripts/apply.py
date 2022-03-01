@@ -27,6 +27,12 @@ def argparser():
         default=False,
         help="Force to remove and add for existing projects",
     )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        default=False,
+        help="Force yes to answer",
+    )
     return parser
 
 def add_project(workspace, project, url):
@@ -123,7 +129,7 @@ def main() -> bool:
             print(f"\tDelete {workspace} workspace")
             print("\n")
         
-        if input("Do you want to proceed with the indicated changes? [y/n] ").lower() not in ("y", "yes"):
+        if args.yes is False and input("Do you want to proceed with the indicated changes? [y/n] ").lower() not in ("y", "yes"):
             return 0
 
         for value in projects_to_remove:

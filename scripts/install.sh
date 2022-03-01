@@ -21,12 +21,13 @@ TMP_DIRPATH="/tmp/neulabs-devops-suite"
 
 main(){
     delete_tmp_dir
-    
+
     git clone https://github.com/neulabscom/neulabs-devops-suite.git ${TMP_DIRPATH}
 
     cd ${TMP_DIRPATH}
     
-    make neulabs-env
+    chmod +x -R scripts bin
+    python3 scripts/setenv.py
 
     if [ -f ~/.bashrc ] ; then
         source ~/.bashrc
@@ -36,11 +37,9 @@ main(){
         source ~/.zshrc
     fi
 
-    make neulabs-bin
+    python3 scripts/bin.py
 
-    make neulabs-dependencies
+    python3 scripts/dependencies.py
 
-    make apply
+    python3 scripts/apply.py --yes
 }
-
-main "$@"
