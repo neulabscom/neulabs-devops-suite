@@ -8,13 +8,8 @@ import datetime
 
 NEULABS_PATH = os.path.join(os.getenv("HOME"), ".neulabs")
 
-if platform.system() == "Darwin":
-    NEULABS_DEVOPS_WORKSPACE = os.path.join("/Users",getpass.getuser(), "/Documents/projects" )
-    NEULABS_AZIONAVENTURES_WORKSPACE = os.path.join(NEULABS_DEVOPS_WORKSPACE, "/azionaventures")
-if platform.system() == "Linux":
-    NEULABS_DEVOPS_WORKSPACE = os.path.join(os.getenv("HOME"), "/projects" )
-    NEULABS_AZIONAVENTURES_WORKSPACE = os.path.join(NEULABS_DEVOPS_WORKSPACE, "/azionaventures")
-
+NEULABS_DEVOPS_WORKSPACE = os.path.join(os.getenv("HOME"), "/projects" )
+NEULABS_AZIONAVENTURES_WORKSPACE = os.path.join(NEULABS_DEVOPS_WORKSPACE, "/azionaventures")
 NEULABS_WORKSPACE_INFRASTRUCTURE = os.path.join(NEULABS_AZIONAVENTURES_WORKSPACE, "/infrastructure")
 NEULABS_WORKSPACE_AZIONACLI = os.path.join(NEULABS_AZIONAVENTURES_WORKSPACE, "/aziona-cli")
 

@@ -4,39 +4,20 @@
 
 1. Python >= 3.8 \[[install](https://www.python.org/downloads/)\]
     - With: pip3, python3-venv
+2. Nodjs >= 14.19 \[[install](https://github.com/nvm-sh/nvm)\]
 3. VSCode \[[install](https://code.visualstudio.com/download)\]
 4. GitHub CLI \[[install](https://cli.github.com/)\]
+5. Utils:
+    - make
+    - wget
+    - curl
+    - git
 
 ### Get Started
 
 Setup local env
 
-    cd
-
-    git clone https://github.com/neulabscom/neulabs-devops-suite.git 
-
-    cd neulabs-devops-suite
-
-    code workspace.code-workspace
-
-    make setup
-
-    source .bashrc # or .zshrc
-
-    make bin
-
-    make dependencies
-
-
-Create .projects.yml and define projects, example:
-
-    project-name:
-        target: subfolder 
-        url: repository url
-
-Download projects
-
-    make apply
+    curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/main/scripts/install.sh | bash
 
 
 ### Usage
