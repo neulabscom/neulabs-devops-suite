@@ -7,12 +7,12 @@ import pathlib
 def _scripts():
     import shutil
 
-    if os.getenv("AZIONA_BIN_PATH") is None:
-        print("AZIONA_BIN_PATH not found in ENV vars")
+    if os.getenv("NEULABS_BIN_PATH") is None:
+        print("NEULABS_BIN_PATH not found in ENV vars")
         return 1
 
     source_dir = pathlib.Path(pathlib.Path(__file__).parent.resolve(), "..", "bin") 
-    dest_dir = pathlib.Path(os.getenv("AZIONA_BIN_PATH"))
+    dest_dir = pathlib.Path(os.getenv("NEULABS_BIN_PATH"))
     
     for file_name in os.listdir(source_dir):
         source = pathlib.Path(source_dir, file_name)

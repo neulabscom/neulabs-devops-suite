@@ -6,63 +6,59 @@ import os
 import datetime
 import pathlib
 
+AZIONA_PATH = pathlib.Path(os.getenv("HOME"), ".aziona")
 NEULABS_PATH = pathlib.Path(os.getenv("HOME"), ".neulabs")
 
 if platform.system() == "Darwin":
-    NEULABS_DEVOPS_WORKSPACE = pathlib.Path(os.getenv("HOME") + "Documents/projects" )
+    NEULABS_WORKSPACE = pathlib.Path(os.getenv("HOME") + "Documents/projects" )
 if platform.system() == "Linux":
-    NEULABS_DEVOPS_WORKSPACE = pathlib.Path(os.getenv("HOME"), "projects")
+    NEULABS_WORKSPACE = pathlib.Path(os.getenv("HOME"), "projects")
 
-NEULABS_AZIONAVENTURES_WORKSPACE = pathlib.Path(NEULABS_DEVOPS_WORKSPACE, "azionaventures")
-NEULABS_WORKSPACE_INFRASTRUCTURE = pathlib.Path(NEULABS_AZIONAVENTURES_WORKSPACE, "infrastructure")
-NEULABS_WORKSPACE_AZIONACLI = pathlib.Path(NEULABS_AZIONAVENTURES_WORKSPACE, "aziona-cli")
+AZIONA_WORKSPACE = pathlib.Path(NEULABS_WORKSPACE, "azionaventures")
 
-# TODO rename AZIONA to NEULABS
 ENV = {
-    "AZIONA_WS_VERSION": "1.0",
-    "AZIONA_ACTIVE_PATH": "/tmp/.aziona_active",
+    "NEULABS_DEVOPS_SUITE_VERSION": "1.0",
+    "NEULABS_ACTIVE_PATH": "/tmp/.neulabs_active",
     "NEULABS_PATH": NEULABS_PATH,
-    "AZIONA_PATH": NEULABS_PATH,
-    "AZIONA_ENV_PATH": os.path.join(NEULABS_PATH, ".env"),
-    "AZIONA_ACTIVE_PERSISTENT_PATH": os.path.join(NEULABS_PATH, ".aziona_active_perisistent"),
-    "AZIONA_BIN_PATH": os.path.join(NEULABS_PATH, "bin"),
-    "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(NEULABS_PATH, "terraform-modules"),
-    "AZIONA_TENANT_PATH": os.path.join(NEULABS_PATH, "tenant"),
-    "NEULABS_DEVOPS_WORKSPACE": NEULABS_DEVOPS_WORKSPACE,
-    "AZIONA_WORKSPACE_PATH": NEULABS_AZIONAVENTURES_WORKSPACE,
-    "NEULABS_WORKSPACE_INFRASTRUCTURE": NEULABS_WORKSPACE_INFRASTRUCTURE,
-    "AZIONA_WORKSPACE_INFRASTRUCTURE": NEULABS_WORKSPACE_INFRASTRUCTURE,
-    "NEULABS_WORKSPACE_AZIONACLI": NEULABS_WORKSPACE_AZIONACLI,
-    "AZIONA_WORKSPACE_AZIONACLI": NEULABS_WORKSPACE_AZIONACLI
+    "NEULABS_ENV_PATH": os.path.join(NEULABS_PATH, ".env"),
+    "NEULABS_ACTIVE_PERSISTENT_PATH": os.path.join(NEULABS_PATH, ".aziona_active_perisistent"),
+    "NEULABS_BIN_PATH": os.path.join(NEULABS_PATH, "bin"),
+    "NEULABS_TENANT_PATH": os.path.join(NEULABS_PATH, "tenant"),
+    "NEULABS_WORKSPACE": NEULABS_WORKSPACE,
+    "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(AZIONA_PATH, "terraform-modules"),
+    "AZIONA_WORKSPACE_INFRASTRUCTURE": pathlib.Path(AZIONA_WORKSPACE, "infrastructure"),
+    "AZIONA_WORKSPACE_AZIONACLI": pathlib.Path(AZIONA_WORKSPACE, "aziona-cli")
 }
 
 RC = """
 # AZIONA CONFIG (configured in %s)
 source %s/.env
-source ${AZIONA_ACTIVE_PERSISTENT_PATH:-}
-export PATH=$PATH:$AZIONA_BIN_PATH
+source ${NEULABS_ACTIVE_PERSISTENT_PATH:-}
+export PATH=$PATH:$NEULABS_BIN_PATH
 # AZIONA CONFIG END
 """ % (datetime.datetime.now(), NEULABS_PATH)
 
 def _configurations():
     try:
-        os.makedirs(f"{ENV['AZIONA_WORKSPACE_PATH']}", exist_ok=True)
-    except Exception:
-        print(f"{ENV['AZIONA_WORKSPACE_PATH']} skip creation.")
+        os.makedirs(f"{ENV['NEULABS_WORKSPACE']}", exist_ok=True)
+    except Exception as e:
+        print(f"Error {ENV['NEULABS_WORKSPACE']} creation.")
+        print(str(e))
+        return 1
 
-    os.makedirs(f"{ENV['AZIONA_PATH']}", exist_ok=True)
-    os.makedirs(f"{ENV['AZIONA_TENANT_PATH']}", exist_ok=True)
-    os.makedirs(f"{ENV['AZIONA_BIN_PATH']}", exist_ok=True)
+    os.makedirs(f"{ENV['NEULABS_PATH']}", exist_ok=True)
+    os.makedirs(f"{ENV['NEULABS_TENANT_PATH']}", exist_ok=True)
+    os.makedirs(f"{ENV['NEULABS_BIN_PATH']}", exist_ok=True)
     os.makedirs(f"{ENV['AZIONA_TERRAFORM_MODULES_PATH']}", exist_ok=True)
 
-    if os.path.isfile(ENV["AZIONA_ENV_PATH"]) is True:
-        os.rename(ENV["AZIONA_ENV_PATH"], ENV["AZIONA_ENV_PATH"] + ".old")
+    if os.path.isfile(ENV["NEULABS_ENV_PATH"]) is True:
+        os.rename(ENV["NEULABS_ENV_PATH"], ENV["NEULABS_ENV_PATH"] + ".old")
 
-    with open(ENV["AZIONA_ENV_PATH"], "w") as f:
+    with open(ENV["NEULABS_ENV_PATH"], "w") as f:
         for key, value in ENV.items():
             f.write(f"export {key}={value}\n")
 
-    with open(ENV["AZIONA_ACTIVE_PERSISTENT_PATH"], "w") as f:
+    with open(ENV["NEULABS_ACTIVE_PERSISTENT_PATH"], "w") as f:
         f.write("")
 
     print("Check in .bashrc or/and .zshrc file: \n" + RC + "\n")

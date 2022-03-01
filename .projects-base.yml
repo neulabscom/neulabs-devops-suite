@@ -5,6 +5,4 @@ azionaventures:
 
 # NEULABS
 neulabs:
-  amazon-data-collector: git@github.com:neulabscom/amazon-data-collector.git
-  keepa-data-collector: git@github.com:neulabscom/keepa-data-collector.git
   neulabs-devops-suite: git@github.com:neulabscom/neulabs-devops-suite.git

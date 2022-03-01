@@ -7,8 +7,9 @@ import os
 import subprocess
 import argparse
 
+AZIONA_PATH = os.getenv("AZIONA_PATH")
 NEULABS_PATH = os.getenv("NEULABS_PATH")
-PROJECTS_FILEPATH = os.getenv("NEULABS_DEVOPS_WORKSPACE", None)
+PROJECTS_FILEPATH = os.getenv("NEULABS_WORKSPACE", None)
 if not (PROJECTS_FILEPATH or NEULABS_PATH):
     raise Exception("Neulabs env not found")
 
@@ -96,6 +97,10 @@ def create_vs_workspace(file_parsed):
             {
                 "name": ".neulabs",
                 "path": NEULABS_PATH
+            },
+            {
+                "name": ".aziona",
+                "path": AZIONA_PATH
             }
         ],
         "settings": {}
