@@ -11,10 +11,10 @@ trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 set -o pipefail
 
 main(){
-    cd /tmp
+    git clone https://github.com/neulabscom/neulabs-devops-suite.git /tmp/neulabs-devops-suite
 
-    git clone https://github.com/neulabscom/neulabs-devops-suite.git
-
+    cd /tmp/neulabs-devops-suite
+    
     make neulabs-env
 
     if [ -f ~/.bashrc ] ; then
