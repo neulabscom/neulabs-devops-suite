@@ -125,7 +125,12 @@ def main() -> bool:
         if not os.path.isfile(args.filename):
             raise FileExistsError(args.filename)
 
-        file_parsed = yaml.load(open(args.filename), Loader=yaml.FullLoader) or {}
+        file_parsed = {}
+
+        if args.filename != PROJECTS_DEFINATION_FILENAME:
+            file_parsed.update(**yaml.load(open(PROJECTS_DEFINATION_FILENAME), Loader=yaml.FullLoader))
+
+        file_parsed.update(**yaml.load(open(args.filename), Loader=yaml.FullLoader))
 
         projects_to_add = []
         projects_to_update = []

@@ -39,7 +39,7 @@ main(){
 
     python3 scripts/bin.py
 
-    python3 scripts/dependencies.py
+    neulabs-dependencies
 
     neulabs-projects --yes --filename .projects-base.yml
 }
