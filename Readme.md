@@ -17,7 +17,7 @@
 
 Setup local env
 
-    curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/main/scripts/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/main/install.sh | bash
 
 
 ### Usage
