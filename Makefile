@@ -6,19 +6,20 @@ help: ## helper
 .DEFAULT_GOAL := help
 
 _chmod:
-	chmod +x scripts bin
+	chmod +x -R scripts bin
 
-setenv:
+neulabs-env:
 	python3 scripts/setenv.py
 
-bin:
+neulabs-bin:
 	python3 scripts/bin.py
 
-dependencies:
+neulabs-dependencies:
 	python3 scripts/dependencies.py
 
 apply:
 	python3 scripts/apply.py
 
-setup: _chmod setenv 
+setup: _chmod
+	./scripts/setup.sh
 

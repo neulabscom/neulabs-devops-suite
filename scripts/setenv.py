@@ -6,25 +6,35 @@ import os
 import getpass
 import datetime
 
-AZIONA_PATH = os.path.join(os.getenv("HOME"), ".aziona")
+NEULABS_PATH = os.path.join(os.getenv("HOME"), ".neulabs")
 
 if platform.system() == "Darwin":
-  AZIONA_WORKSPACE_PATH = os.path.join("/Users",getpass.getuser(), "/Documents/neulabs-devops-suite/projects/azionaventures")
+    NEULABS_DEVOPS_WORKSPACE = os.path.join("/Users",getpass.getuser(), "/Documents/projects" )
+    NEULABS_AZIONAVENTURES_WORKSPACE = os.path.join(NEULABS_DEVOPS_WORKSPACE, "/azionaventures")
 if platform.system() == "Linux":
-  AZIONA_WORKSPACE_PATH = os.path.join(os.getenv("HOME"), "/neulabs-devops-suite/projects/azionaventures")
+    NEULABS_DEVOPS_WORKSPACE = os.path.join(os.getenv("HOME"), "/projects" )
+    NEULABS_AZIONAVENTURES_WORKSPACE = os.path.join(NEULABS_DEVOPS_WORKSPACE, "/azionaventures")
 
+NEULABS_WORKSPACE_INFRASTRUCTURE = os.path.join(NEULABS_AZIONAVENTURES_WORKSPACE, "/infrastructure")
+NEULABS_WORKSPACE_AZIONACLI = os.path.join(NEULABS_AZIONAVENTURES_WORKSPACE, "/aziona-cli")
+
+# TODO rename AZIONA to NEULABS
 ENV = {
     "AZIONA_WS_VERSION": "1.0",
     "AZIONA_ACTIVE_PATH": "/tmp/.aziona_active",
-    "AZIONA_PATH": AZIONA_PATH,
-    "AZIONA_ENV_PATH": os.path.join(AZIONA_PATH, ".env"),
-    "AZIONA_ACTIVE_PERSISTENT_PATH": os.path.join(AZIONA_PATH, ".aziona_active_perisistent"),
-    "AZIONA_BIN_PATH": os.path.join(AZIONA_PATH, "bin"),
-    "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(AZIONA_PATH, "terraform-modules"),
-    "AZIONA_TENANT_PATH": os.path.join(AZIONA_PATH, "tenant"),
-    "AZIONA_WORKSPACE_PATH": AZIONA_WORKSPACE_PATH,
-    "AZIONA_WORKSPACE_INFRASTRUCTURE": os.path.join(AZIONA_WORKSPACE_PATH, "/infrastructure"),
-    "AZIONA_WORKSPACE_AZIONACLI": os.path.join(AZIONA_WORKSPACE_PATH, "/aziona-cli")
+    "NEULABS_PATH": NEULABS_PATH,
+    "AZIONA_PATH": NEULABS_PATH,
+    "AZIONA_ENV_PATH": os.path.join(NEULABS_PATH, ".env"),
+    "AZIONA_ACTIVE_PERSISTENT_PATH": os.path.join(NEULABS_PATH, ".aziona_active_perisistent"),
+    "AZIONA_BIN_PATH": os.path.join(NEULABS_PATH, "bin"),
+    "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(NEULABS_PATH, "terraform-modules"),
+    "AZIONA_TENANT_PATH": os.path.join(NEULABS_PATH, "tenant"),
+    "NEULABS_DEVOPS_WORKSPACE": NEULABS_DEVOPS_WORKSPACE,
+    "AZIONA_WORKSPACE_PATH": NEULABS_AZIONAVENTURES_WORKSPACE,
+    "NEULABS_WORKSPACE_INFRASTRUCTURE": NEULABS_WORKSPACE_INFRASTRUCTURE,
+    "AZIONA_WORKSPACE_INFRASTRUCTURE": NEULABS_WORKSPACE_INFRASTRUCTURE,
+    "NEULABS_WORKSPACE_AZIONACLI": NEULABS_WORKSPACE_AZIONACLI,
+    "AZIONA_WORKSPACE_AZIONACLI": NEULABS_WORKSPACE_AZIONACLI
 }
 
 RC = """

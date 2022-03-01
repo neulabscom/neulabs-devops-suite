@@ -4,9 +4,13 @@ import os
 import subprocess
 import argparse
 
-PROJECTS_FILEPATH = "./projects"
+PROJECTS_FILEPATH = os.getenv("NEULABS_DEVOPS_WORKSPACE", None)
+if PROJECTS_FILEPATH is None:
+    raise Exception("Neulabs env not found")
+
 PROJECTS_DEFINATION_FILENAME = ".projects.yml"
-EXCLUDE_PROJECTS_NAME = (".gitignore", )
+PROJECTS_VS_WORKSPACE_FILENAME = "projects.code-workspace"
+PROJECTS_EXCLUDE = ( PROJECTS_VS_WORKSPACE_FILENAME, "default" )
 
 def argparser():
     parser = argparse.ArgumentParser()
@@ -25,27 +29,47 @@ def argparser():
     )
     return parser
 
-def main() -> bool:
-    def add(**projects):
-        for project, data in projects.items():
-            print(f"[MODULE] Add {project}")
-            path = os.path.join(PROJECTS_FILEPATH, data.get('target', "defualt"), project)
-            cmd = f"git clone {data['url']} {path}"
-            print(f"Command: {cmd}")
+def add_project(workspace, project, url):
+        path = os.path.join(PROJECTS_FILEPATH, workspace, project)
+        if not os.path.isdir(path):
+            cmd = f"git clone {url} {path}"
             subprocess.check_call(cmd, shell=True)
+            print(f"[SUCCESS] Add {project} in {path}")
+        else:
+            print(f"[ERROR] Add {project} in {path}")
 
-    def update(**projects):
-        for project, data in projects.items():
-            print(f"[MODULE] Update {project}")
-            remove(**{project:data})
-            add(**{project:data})
+def remove_workspace(workspace):
+    path = os.path.join(PROJECTS_FILEPATH, workspace)
+    if os.path.isdir(path):
+        subprocess.check_call(f"rm -rf {path}", shell=True)
+        print(f"[SUCCESS] Remove {workspace} in {path}")
+    else:
+        print(f"[ERROR] Remove {workspace} in {path}")
 
-    def remove(**projects):
-        for project, data in projects:
-            print(f"[MODULE] Remove {project}")
-            path = os.path.join(PROJECTS_FILEPATH, data.get('target', "default"), project)
-            subprocess.check_call(f"rm -rf ./{path}", shell=True)
-            
+def remove_project(workspace, project):
+    path = os.path.join(PROJECTS_FILEPATH, workspace, project)
+    if os.path.isdir(path):
+        subprocess.check_call(f"rm -rf {path}", shell=True)
+        print(f"[SUCCESS] Remove {project} in {path}")
+    else:
+        print(f"[ERROR] Remove {project} in {path}")
+
+def create_vs_workspace(file_parsed):
+    import json
+    vs_workspace = {
+        "folders": [],
+        "settings": {}
+    }
+    for workspace, data in file_parsed.items():
+        vs_workspace["folders"].append({
+            "name": workspace,
+            "path": os.path.join(PROJECTS_FILEPATH, workspace)
+        })
+    with open(os.path.join(PROJECTS_FILEPATH, PROJECTS_VS_WORKSPACE_FILENAME), "w") as f:
+        f.write(json.dumps(vs_workspace))
+
+
+def main() -> bool:
     try:
         args = argparser().parse_args()
 
@@ -54,28 +78,68 @@ def main() -> bool:
 
         file_parsed = yaml.load(open(args.filename), Loader=yaml.FullLoader) or {}
         
-        base_projects = [ i for i in os.listdir(PROJECTS_FILEPATH) if i not in EXCLUDE_PROJECTS_NAME ]
-        projects = []
+        projects_to_add = []
+        projects_to_update = []
+        projects_to_remove = []
+        projects_to_remove_workspace = []
 
-        for k in base_projects:
-            projects += os.listdir(os.path.join(PROJECTS_FILEPATH, k))
+        existing_workspace = {} 
+        for target in [ p for p in os.listdir(PROJECTS_FILEPATH) if p not in PROJECTS_EXCLUDE ]:
+            existing_workspace[target] = os.listdir(os.path.join(PROJECTS_FILEPATH, target))
 
-        project_add = list(set(file_parsed.keys()).difference(projects))
-        project_update = list(set(file_parsed.keys()).intersection(projects))
-        project_remove = list(set(projects).difference(file_parsed.keys()))
+            if target in file_parsed.keys():
+                remove = set(existing_workspace[target]).difference(file_parsed[target])
+                if remove:
+                    projects_to_remove.append((target, remove))
+            else:
+                projects_to_remove_workspace.append(target)
 
-        print("[CHANGES]")
-        [print(f"\t+ {k}") for k in project_add]
-        [print(f"\t= {k}") for k in project_update]
-        [print(f"\t- {k}") for k in project_remove]
+        for workspace, projects in file_parsed.items():
+            add = set(projects).difference(existing_workspace.get(workspace, {}))
+            if add:
+                projects_to_add.append((workspace, { k:projects[k] for k in add}))
+
+            update = set(projects).intersection(existing_workspace.get(workspace, {}))
+            if update and args.force:
+                projects_to_update.append((workspace, { k:projects[k] for k in update}))
+        
+        print("[ADD CHANGES]")
+        for workspace, data in projects_to_add:
+            print(f"\t{workspace} workspace:")
+            [print(f"\t  + {project} (from {url})") for project, url in data.items()]
+
+        print("\n[REMOVE CHANGES]")
+        for workspace, data in projects_to_remove:
+            print(f"\t{workspace} workspace:")
+            [print(f"\t  - {project}") for project in data]
+
+        print("\n[UPDATE CHANGES]")
+        for workspace, data in projects_to_update:
+            print(f"\t{workspace} workspace:")
+            [print(f"\t  = {project} (from {url})") for project, url in data.items()]
+
+        print("\n[REMOVE WORKSPACE]")
+        for workspace in projects_to_remove_workspace:
+            print(f"\tDelete {workspace} workspace")
+            print("\n")
         
         if input("Do you want to proceed with the indicated changes? [y/n] ").lower() not in ("y", "yes"):
             return 0
 
-        remove(*project_remove)
-        add(**{ k:v for k, v in file_parsed.items() if k in project_add})
-        if args.force:
-            update(**{ k:v for k, v in file_parsed.items() if k in project_update})
+        for value in projects_to_remove:
+            [ remove_project(workspace=value[0], project=project) for project in value[1]]
+
+        for value in projects_to_remove_workspace:
+            [ remove_workspace(workspace=value)]
+
+        for value in projects_to_add:
+            [ add_project(workspace=value[0], project=project, url=url) for project, url in value[1].items()]
+
+        for value in projects_to_update:
+            [ remove_project(workspace=value[0], project=project) for project in value[1]]
+            [ add_project(workspace=value[0], project=project, url=url) for project, url in value[1].items()]
+
+        create_vs_workspace(file_parsed)
     except KeyboardInterrupt as e:
         raise Exception(str(e))
     except Exception as e:
