@@ -1,3 +1,4 @@
+import pathlib
 import sys
 import yaml
 import os
@@ -9,8 +10,10 @@ if PROJECTS_FILEPATH is None:
     raise Exception("Neulabs env not found")
 
 PROJECTS_DEFINATION_FILENAME = ".projects.yml"
+PROJECTS_VS_EXTENSIONS_FILENAME = pathlib.Path(".vscode", "extensions.json")
+PROJECTS_VS_SETTINGS_FILENAME = pathlib.Path(".vscode", "settings.json")
 PROJECTS_VS_WORKSPACE_FILENAME = "projects.code-workspace"
-PROJECTS_EXCLUDE = ( PROJECTS_VS_WORKSPACE_FILENAME, "default" )
+WORKSPACE_EXCLUDE = ( PROJECTS_VS_WORKSPACE_FILENAME, "default", ".vscode" )
 
 def argparser():
     parser = argparse.ArgumentParser()
@@ -36,7 +39,7 @@ def argparser():
     return parser
 
 def add_project(workspace, project, url):
-        path = os.path.join(PROJECTS_FILEPATH, workspace, project)
+        path = pathlib.Path(PROJECTS_FILEPATH, workspace, project)
         if not os.path.isdir(path):
             cmd = f"git clone {url} {path}"
             subprocess.check_call(cmd, shell=True)
@@ -45,7 +48,7 @@ def add_project(workspace, project, url):
             print(f"[ERROR] Add {project} in {path}")
 
 def remove_workspace(workspace):
-    path = os.path.join(PROJECTS_FILEPATH, workspace)
+    path = pathlib.Path(PROJECTS_FILEPATH, workspace)
     if os.path.isdir(path):
         subprocess.check_call(f"rm -rf {path}", shell=True)
         print(f"[SUCCESS] Remove {workspace} in {path}")
@@ -53,7 +56,7 @@ def remove_workspace(workspace):
         print(f"[ERROR] Remove {workspace} in {path}")
 
 def remove_project(workspace, project):
-    path = os.path.join(PROJECTS_FILEPATH, workspace, project)
+    path = pathlib.Path(PROJECTS_FILEPATH, workspace, project)
     if os.path.isdir(path):
         subprocess.check_call(f"rm -rf {path}", shell=True)
         print(f"[SUCCESS] Remove {project} in {path}")
@@ -62,8 +65,32 @@ def remove_project(workspace, project):
 
 def create_vs_workspace(file_parsed):
     import json
+    os.makedirs(pathlib.Path(PROJECTS_FILEPATH, ".vscode"),exist_ok=True)
+    vs_extensions = {
+        "recommendations": [
+            "esbenp.prettier-vscode",
+            "eamodio.gitlens",
+            "leodevbro.blockman",
+            "ms-azuretools.vscode-docker",
+            "hashicorp.terraform",
+            "ms-python.python",
+            "redhat.vscode-yaml",
+            "shakram02.bash-beautify"
+        ]
+    }
+    with open(pathlib.Path(PROJECTS_FILEPATH, PROJECTS_VS_EXTENSIONS_FILENAME), "w") as f:
+        f.write(json.dumps(vs_extensions))
+
+    vs_settins = {}
+    with open(pathlib.Path(PROJECTS_FILEPATH, PROJECTS_VS_SETTINGS_FILENAME), "w") as f:
+        f.write(json.dumps(vs_settins))
+
     vs_workspace = {
-        "folders": [],
+        "folders": [
+            {
+                "path": ".vscode"
+            }
+        ],
         "settings": {}
     }
     for workspace, data in file_parsed.items():
@@ -71,9 +98,13 @@ def create_vs_workspace(file_parsed):
             "name": workspace,
             "path": os.path.join(PROJECTS_FILEPATH, workspace)
         })
-    with open(os.path.join(PROJECTS_FILEPATH, PROJECTS_VS_WORKSPACE_FILENAME), "w") as f:
+    with open(pathlib.Path(PROJECTS_FILEPATH, PROJECTS_VS_WORKSPACE_FILENAME), "w") as f:
         f.write(json.dumps(vs_workspace))
 
+def create_projects_yml(file_parsed):
+    with open(pathlib.Path(PROJECTS_DEFINATION_FILENAME), "w") as f:
+        f.write(yaml.dump(file_parsed))
+    
 
 def main() -> bool:
     try:
@@ -83,15 +114,15 @@ def main() -> bool:
             raise FileExistsError(args.filename)
 
         file_parsed = yaml.load(open(args.filename), Loader=yaml.FullLoader) or {}
-        
+
         projects_to_add = []
         projects_to_update = []
         projects_to_remove = []
         projects_to_remove_workspace = []
 
         existing_workspace = {} 
-        for target in [ p for p in os.listdir(PROJECTS_FILEPATH) if p not in PROJECTS_EXCLUDE ]:
-            existing_workspace[target] = os.listdir(os.path.join(PROJECTS_FILEPATH, target))
+        for target in [ w for w in os.listdir(PROJECTS_FILEPATH) if w not in WORKSPACE_EXCLUDE ]:
+            existing_workspace[target] = os.listdir(pathlib.Path(PROJECTS_FILEPATH, target))
 
             if target in file_parsed.keys():
                 remove = set(existing_workspace[target]).difference(file_parsed[target])
@@ -100,7 +131,7 @@ def main() -> bool:
             else:
                 projects_to_remove_workspace.append(target)
 
-        for workspace, projects in file_parsed.items():
+        for workspace, projects in {w:file_parsed[w] for w in file_parsed.keys() if w not in WORKSPACE_EXCLUDE}.items():
             add = set(projects).difference(existing_workspace.get(workspace, {}))
             if add:
                 projects_to_add.append((workspace, { k:projects[k] for k in add}))
@@ -146,6 +177,7 @@ def main() -> bool:
             [ add_project(workspace=value[0], project=project, url=url) for project, url in value[1].items()]
 
         create_vs_workspace(file_parsed)
+        create_projects_yml(file_parsed)
     except KeyboardInterrupt as e:
         raise Exception(str(e))
     except Exception as e:

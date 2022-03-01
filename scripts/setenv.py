@@ -38,11 +38,11 @@ ENV = {
 
 RC = """
 # AZIONA CONFIG (configured in %s)
-source ~/.aziona/.env
+source %s/.env
 source ${AZIONA_ACTIVE_PERSISTENT_PATH:-}
 export PATH=$PATH:$AZIONA_BIN_PATH
 # AZIONA CONFIG END
-""" % datetime.datetime.now()
+""" % (datetime.datetime.now(), NEULABS_PATH)
 
 def _configurations():
     try:

@@ -41,7 +41,7 @@ main(){
 
     python3 scripts/dependencies.py
 
-    python3 scripts/apply.py --yes
+    python3 scripts/apply.py --yes --filename .projects-base.yml
 }
 
 main "$@"
