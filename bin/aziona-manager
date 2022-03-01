@@ -101,7 +101,7 @@ def main():
             && git clone {WS_GITHUB_REPO_URL} cloned \
             && cd cloned \
             && git checkout {args.bin_update} \
-            && make setup", shell=True)
+            && python3 scripts/bin.py", shell=True)
         tmp_dir.cleanup()
 
     if args.tf_module_add:

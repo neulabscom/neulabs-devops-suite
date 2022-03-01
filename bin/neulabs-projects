@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pathlib
 import sys
 import yaml
@@ -5,11 +7,12 @@ import os
 import subprocess
 import argparse
 
+NEULABS_PATH = os.getenv("NEULABS_PATH")
 PROJECTS_FILEPATH = os.getenv("NEULABS_DEVOPS_WORKSPACE", None)
-if PROJECTS_FILEPATH is None:
+if not (PROJECTS_FILEPATH or NEULABS_PATH):
     raise Exception("Neulabs env not found")
 
-PROJECTS_DEFINATION_FILENAME = ".projects.yml"
+PROJECTS_DEFINATION_FILENAME = pathlib.Path(NEULABS_PATH, ".projects.yml")
 PROJECTS_VS_EXTENSIONS_FILENAME = pathlib.Path(".vscode", "extensions.json")
 PROJECTS_VS_SETTINGS_FILENAME = pathlib.Path(".vscode", "settings.json")
 PROJECTS_VS_WORKSPACE_FILENAME = "projects.code-workspace"
@@ -89,6 +92,10 @@ def create_vs_workspace(file_parsed):
         "folders": [
             {
                 "path": ".vscode"
+            },
+            {
+                "name": ".neulabs",
+                "path": NEULABS_PATH
             }
         ],
         "settings": {}

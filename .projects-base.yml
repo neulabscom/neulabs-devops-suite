@@ -7,6 +7,4 @@ azionaventures:
 neulabs:
   amazon-data-collector: git@github.com:neulabscom/amazon-data-collector.git
   keepa-data-collector: git@github.com:neulabscom/keepa-data-collector.git
-
-default:
   neulabs-devops-suite: git@github.com:neulabscom/neulabs-devops-suite.git
