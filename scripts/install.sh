@@ -43,3 +43,5 @@ main(){
 
     python3 scripts/apply.py --yes
 }
+
+main "$@"
