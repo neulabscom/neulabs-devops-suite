@@ -7,7 +7,7 @@ import os
 import subprocess
 
 sys.path.insert(1, "/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules")#os.getenv("NEULABS_MODULES_PATH"))
-import workspace, setenv, dependencies
+import workspace, setenv, dependencies, kube
 
 GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
 
@@ -99,7 +99,6 @@ def argsinstance():
         parser_depends_system = subparsers.add_parser("dependencies-install", help="Install third part dependicies")
         dependencies.argsinstance(parser_depends_system)
 
-
         parser_info_system = subparsers.add_parser("info", help="Show neulabs info")
         parser_info_system.add_argument(
             "info",
@@ -112,6 +111,10 @@ def argsinstance():
         parser_workspace = parser.add_parser("workspace", help="Manage workspace")
         workspace.argsinstance(parser_workspace)
 
+    def _kube(parser):
+        parser_workspace = parser.add_parser("kube", help="Kube action for neulabs cluster")
+        kube.argsinstance(parser_workspace)
+
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help="Help for command", dest="command")
  
@@ -119,6 +122,7 @@ def argsinstance():
     _tenant(subparsers)
     _system(subparsers)
     _workspace(subparsers)
+    _kube(subparsers)
 
     return parser
 
@@ -227,6 +231,9 @@ def cmd_terraform(args):
 def cmd_workspace(args):
     workspace.main(args)
 
+def cmd_kube(args):
+    kube.main(args)
+
 def main():
     args = argsinstance().parse_args()
 
@@ -241,6 +248,9 @@ def main():
 
     if args.command == "workspace":
         cmd_workspace(args)
+
+    if args.command == "kube":
+        cmd_kube(args)
 
 
 if __name__ == "__main__":

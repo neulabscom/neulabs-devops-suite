@@ -6,40 +6,40 @@ import subprocess
 import os
 from kubernetes import client, config
 
-def argsinstance():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-p",
-        "--pod",
-        required=True,
-        type=str,
-        help="Pod name",
-    )
-    parser.add_argument(
-        '-c', 
-        '--container', 
-        type=str, 
-        help="Container name"
-    )
-    parser.add_argument(
-        '--cmd', 
-        default='/bin/bash', 
-        type=str, 
-        help="Comand"
-    )
+def argsinstance(parser = None):
+    def _exec(parser):
+        parser_exec = parser.add_parser("exec", help="Kube exec")
+        parser_exec.add_argument(
+            "-p",
+            "--pod",
+            required=True,
+            type=str,
+            help="Pod name",
+        )
+        parser_exec.add_argument(
+            '-c', 
+            '--container', 
+            type=str, 
+            help="Container name"
+        )
+        parser_exec.add_argument(
+            '--cmd', 
+            default='/bin/bash', 
+            type=str, 
+            help="Comand"
+        )
+        
+    if parser is None:
+        parser = argparse.ArgumentParser()
+    
+    subparsers = parser.add_subparsers(help="Help for command", dest="subcommand")
+    _exec(subparsers)
+    
     return parser
+    
 
 
-def main():
-    try:
-        if os.getenv("NEULABS_ENABLED") != "true":
-            print("[ERROR] Before activate neulabs env with: neulabs-activate")
-            return 1
-
-        print(os.getenv("AZIONA_WELCOME_MESSAGE"))
-
-        args = argsinstance().parse_args()
-
+def exec_action(args):
         try:
             config.load_kube_config()
             v1 = client.CoreV1Api()
@@ -76,6 +76,19 @@ def main():
             return 1
 
         subprocess.check_call(f"kubectl exec -it {pods[index]} -c {container} -- {args.cmd}", shell=True)
+
+def main(args = None):
+    try:
+        if os.getenv("NEULABS_ENABLED") != "true":
+            print("[ERROR] Before activate neulabs env with: neulabs-activate")
+            return 1
+        print(os.getenv("AZIONA_WELCOME_MESSAGE"))
+
+        if args is None:
+            args = argsinstance().parse_args()
+
+        if args.subcommand == "exec":
+            exec_action(args)
     except KeyboardInterrupt:
         return 0
 
