@@ -6,6 +6,9 @@ import argparse
 import os
 import subprocess
 
+sys.path.insert(1, os.getenv("NEULABS_MODULES_PATH"))
+import workspace
+
 GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
 
 def argsinstance():
@@ -43,7 +46,6 @@ def argsinstance():
             help="Git repository  url",
         )
 
-
     def _tenant(parser):
         parser_tenant = parser.add_parser("tenant", help="Manage tenant settings")
         subparsers = parser_tenant.add_subparsers(help="Help for command", dest="type")
@@ -79,7 +81,7 @@ def argsinstance():
         )
 
     def _neulabs(parser):
-        parser_neulbas = parser.add_parser("neulabs", help="Manage neulabs env")
+        parser_neulbas = parser.add_parser("system", help="Manage neulabs env")
         subparsers = parser_neulbas.add_subparsers(help="Help for command", dest="type")
 
         parser_bin_neulabs = subparsers.add_parser("update", help="Update neulabs system")
@@ -98,12 +100,17 @@ def argsinstance():
             help="Show WS and Aziona info",
         )
 
+    def _workspace(parser):
+        parser_neulbas = parser.add_parser("workspace", help="Manage neulabs env")
+        workspace.argsinstance(parser_neulbas)
+
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help="Help for command", dest="command")
  
     _terraform(subparsers)
     _tenant(subparsers)
     _neulabs(subparsers)
+    _workspace(subparsers)
 
     return parser
 
@@ -150,7 +157,7 @@ def print_info():
         print(f"| ")
     print("+---") 
 
-def neulabs(args):
+def cmd_neulabs(args):
     if args.type == "info":
         print_info()
 
@@ -160,7 +167,7 @@ def neulabs(args):
         subprocess.check_call(f"curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/{args.branch}/install.sh | bash", shell=True)
         tmp_dir.cleanup()
 
-def tenant(args):
+def cmd_tenant(args):
     if args.type == "add":
         name = args.name if args.name else args.url.split("/")[-1].replace(".git", "")
         tenant_path = pathlib.Path(os.getenv('NEULABS_TENANT_PATH'), name)
@@ -186,7 +193,7 @@ def tenant(args):
             else:
                 subprocess.check_call(f"cd {os.getenv('NEULABS_TENANT_PATH')} && rm -Rf {module}", shell=True)
 
-def terraform(args):
+def cmd_terraform(args):
     if args.type == "update":
         for module in args.name:
             tf_path = pathlib.Path(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), module)
@@ -212,18 +219,23 @@ def terraform(args):
             else:
                 subprocess.check_call(f"cd {os.getenv('AZIONA_TERRAFORM_MODULES_PATH')} && rm -Rf {module}", shell=True)
 
+def cmd_workspace(args):
+    workspace.main(args)
+
 def main():
     args = argsinstance().parse_args()
-    print(args)
 
     if args.command == "neulabs":
-        neulabs(args)
+        cmd_neulabs(args)
 
     if args.command == "tenant":
-        tenant(args)
+        cmd_tenant(args)
 
     if args.command == "terraform":
-        terraform(args)
+        cmd_terraform(args)
+
+    if args.command == "workspace":
+        cmd_workspace(args)
 
 
 if __name__ == "__main__":

@@ -21,13 +21,14 @@ ENV = {
     "NEULABS_DEVOPS_SUITE_VERSION": "1.0",
     "NEULABS_ACTIVE_PATH": "/tmp/.neulabs_active",
     "NEULABS_PATH": NEULABS_PATH,
-    "NEULABS_ENV_PATH": os.path.join(NEULABS_PATH, ".env"),
-    "NEULABS_ACTIVE_PERSISTENT_PATH": os.path.join(NEULABS_PATH, ".aziona_active_perisistent"),
-    "NEULABS_BIN_PATH": os.path.join(NEULABS_PATH, "bin"),
-    "NEULABS_TENANT_PATH": os.path.join(NEULABS_PATH, "tenant"),
+    "NEULABS_ENV_PATH": pathlib.Path(NEULABS_PATH, ".env"),
+    "NEULABS_ACTIVE_PERSISTENT_PATH": pathlib.Path(NEULABS_PATH, ".neulabs_active_perisistent"),
+    "NEULABS_BIN_PATH": pathlib.Path(NEULABS_PATH, "bin"),
+    "NEULABS_MODULES_PATH": pathlib.Path(NEULABS_PATH, "modules"),
+    "NEULABS_TENANT_PATH": pathlib.Path(NEULABS_PATH, "tenant"),
     "NEULABS_WORKSPACE": NEULABS_WORKSPACE,
     "AZIONA_PATH": AZIONA_PATH,
-    "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(AZIONA_PATH, "terraform-modules"),
+    "AZIONA_TERRAFORM_MODULES_PATH": pathlib.Path(AZIONA_PATH, "terraform-modules"),
     "PROJECT_INFRASTRUCTURE": pathlib.Path(AZIONA_WORKSPACE, "infrastructure")
 }
 
@@ -53,7 +54,7 @@ def _configurations():
     os.makedirs(f"{ENV['AZIONA_TERRAFORM_MODULES_PATH']}", exist_ok=True)
 
     if os.path.isfile(ENV["NEULABS_ENV_PATH"]) is True:
-        os.rename(ENV["NEULABS_ENV_PATH"], ENV["NEULABS_ENV_PATH"] + ".old")
+        os.rename(ENV["NEULABS_ENV_PATH"], str(ENV["NEULABS_ENV_PATH"]) + ".old")
 
     with open(ENV["NEULABS_ENV_PATH"], "w") as f:
         for key, value in ENV.items():
