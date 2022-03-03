@@ -7,7 +7,7 @@ import os
 import subprocess
 
 sys.path.insert(1, "/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules")#os.getenv("NEULABS_MODULES_PATH"))
-import workspace, setenv, dependencies, kube, aws
+import workspace, setenv, dependencies, kube, aws, infrastructure
 
 GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
 
@@ -118,6 +118,10 @@ def argsinstance():
     def _aws(parser):
         parser_aws = parser.add_parser("aws", help="Aws action")
         aws.argsinstance(parser_aws)
+
+    def _infrastructure(parser):
+        parser__infrastructure = parser.add_parser("infra", help="Aws action")
+        infrastructure.argsinstance(parser__infrastructure)
     
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help="Help for command", dest="command")
@@ -128,6 +132,7 @@ def argsinstance():
     _workspace(subparsers)
     _kube(subparsers)
     _aws(subparsers)
+    _infrastructure(subparsers)
 
     return parser
 
@@ -242,6 +247,9 @@ def cmd_kube(args):
 def cmd_aws(args):
     aws.main(args)
 
+def cmd_infrastructure(args):
+    infrastructure.main(args)
+
 def main():
     args = argsinstance().parse_args()
 
@@ -262,6 +270,9 @@ def main():
 
     if args.command == "aws":
         cmd_aws(args)
+
+    if args.command == "infra":
+        cmd_infrastructure(args)
 
 
 if __name__ == "__main__":
