@@ -7,7 +7,7 @@ import os
 import subprocess
 
 sys.path.insert(1, "/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules")#os.getenv("NEULABS_MODULES_PATH"))
-import workspace, setenv, dependencies, kube
+import workspace, setenv, dependencies, kube, aws
 
 GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
 
@@ -115,6 +115,10 @@ def argsinstance():
         parser_workspace = parser.add_parser("kube", help="Kube action for neulabs cluster")
         kube.argsinstance(parser_workspace)
 
+    def _aws(parser):
+        parser_aws = parser.add_parser("aws", help="Aws action")
+        aws.argsinstance(parser_aws)
+    
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help="Help for command", dest="command")
  
@@ -123,6 +127,7 @@ def argsinstance():
     _system(subparsers)
     _workspace(subparsers)
     _kube(subparsers)
+    _aws(subparsers)
 
     return parser
 
@@ -234,6 +239,9 @@ def cmd_workspace(args):
 def cmd_kube(args):
     kube.main(args)
 
+def cmd_aws(args):
+    aws.main(args)
+
 def main():
     args = argsinstance().parse_args()
 
@@ -251,6 +259,9 @@ def main():
 
     if args.command == "kube":
         cmd_kube(args)
+
+    if args.command == "aws":
+        cmd_aws(args)
 
 
 if __name__ == "__main__":
