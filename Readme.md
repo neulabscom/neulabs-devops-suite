@@ -7,7 +7,7 @@
     - With: pip3, python3-venv
 2. Nodjs >= 14.19 \[[install](https://github.com/nvm-sh/nvm)\]
 3. VSCode \[[install](https://code.visualstudio.com/download)\]
-4. Utils: 
+4. Utils:
     - bash
     - curl
 5. (Only MacOS) Docker \[[install](https://docs.docker.com/desktop/mac/install/)\]
@@ -27,35 +27,12 @@ Setup local env
 
 ### Usage
 
-**Start shell with company credentials**:
+... in progress
 
-    # Start env in terminal
-    source aziona-activate --company NOME --env ENV
+### Devmode
 
-    - or - 
-
-    # Start env persistent
-    source aziona-persistent-activate --company NOME --env ENV
-
-**De-active persistent env**:
-
-    source aziona-persistent-deactivate
-
-
-**Manager add/update terraform, bin, and tenant-settings**:
-
-    aziona-manager --help
-
-
-**Enter in container on specific POD**:
-
-    aziona-kube-exec -p POD_NAME -c CONTAINER_NAME
-
-**Login to aws-ecr**:
-
-    aziona-ecr-login
-
-**Run infrastructure templates**:
-
-    aziona-infra -t TEMPLATE_NAME target1 target2 ...
-
+    git clone https://github.com/neulabscom/neulabs-devops-suite.git
+    cd neulabs-devops-suite
+    chmod +x devmode.sh
+    ./devmode.sh
+    source .venv/bin/active

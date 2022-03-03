@@ -1,131 +1,158 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
-import pathlib
-import sys
 import argparse
 import os
+import pathlib
 import subprocess
+import sys
 
-sys.path.insert(1, "/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules")#os.getenv("NEULABS_MODULES_PATH"))
-import workspace, setenv, dependencies, kube, aws, infrastructure
+import aws
+import dependencies
+import infrastructure
+import kube
+import setenv
+import workspace
 
-GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
+# os.getenv("NEULABS_MODULES_PATH"))
+sys.path.insert(
+    1, '/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules')
+
+GITHUB_REPO_URL = 'https://github.com/neulabscom/neulabs-devops-suite.git'
+
 
 def argsinstance():
     def _terraform(parser):
-        parser_terraform = parser.add_parser("terraform", help="Manage terraform module")
-        subparsers = parser_terraform.add_subparsers(help="Help for command", dest="type")
+        parser_terraform = parser.add_parser(
+            'terraform', help='Manage terraform module')
+        subparsers = parser_terraform.add_subparsers(
+            help='Help for command', dest='type')
 
-        parser_update_terraform = subparsers.add_parser("update", help="Manage terraform module")
+        parser_update_terraform = subparsers.add_parser(
+            'update', help='Manage terraform module')
         parser_update_terraform.add_argument(
-            "name",
-            nargs="+",
+            'name',
+            nargs='+',
             type=str,
-            help="Module name",
+            help='Module name',
         )
 
-        parser_rm_terraform = subparsers.add_parser("rm", help="Manage terraform module")
+        parser_rm_terraform = subparsers.add_parser(
+            'rm', help='Manage terraform module')
         parser_rm_terraform.add_argument(
-            "name",
-            nargs="+",
+            'name',
+            nargs='+',
             type=str,
-            help="Module name",
+            help='Module name',
         )
 
-        parser_add_terraform = subparsers.add_parser("add", help="Manage terraform module")
+        parser_add_terraform = subparsers.add_parser(
+            'add', help='Manage terraform module')
         parser_add_terraform.add_argument(
-            "--url",
+            '--url',
             required=True,
             type=str,
-            help="Git repository  url",
+            help='Git repository  url',
         )
         parser_add_terraform.add_argument(
-            "--name",
+            '--name',
             required=False,
             type=str,
-            help="Git repository  url",
+            help='Git repository  url',
         )
 
     def _tenant(parser):
-        parser_tenant = parser.add_parser("tenant", help="Manage tenant settings")
-        subparsers = parser_tenant.add_subparsers(help="Help for command", dest="type")
+        parser_tenant = parser.add_parser(
+            'tenant', help='Manage tenant settings')
+        subparsers = parser_tenant.add_subparsers(
+            help='Help for command', dest='type')
 
-
-        parser_setenv = subparsers.add_parser("active", help="Active shell env with tenant settings")
+        parser_setenv = subparsers.add_parser(
+            'active', help='Active shell env with tenant settings')
         setenv.argsinstance(parser_setenv)
 
-        parser_update_tenant = subparsers.add_parser("update", help="Manage terraform module")
+        parser_update_tenant = subparsers.add_parser(
+            'update', help='Manage terraform module')
         parser_update_tenant.add_argument(
-            "name",
-            nargs="+",
+            'name',
+            nargs='+',
             type=str,
-            help="Tenant name",
-        )        
-        
-        parser_rm_tenant = subparsers.add_parser("rm", help="Manage terraform module")
-        parser_rm_tenant.add_argument(
-            "name",
-            nargs="+",
-            type=str,
-            help="Tenant name",
+            help='Tenant name',
         )
 
-        parser_add_tenant = subparsers.add_parser("add", help="Manage terraform module")
+        parser_rm_tenant = subparsers.add_parser(
+            'rm', help='Manage terraform module')
+        parser_rm_tenant.add_argument(
+            'name',
+            nargs='+',
+            type=str,
+            help='Tenant name',
+        )
+
+        parser_add_tenant = subparsers.add_parser(
+            'add', help='Manage terraform module')
         parser_add_tenant.add_argument(
-            "--url",
+            '--url',
             required=True,
             type=str,
-            help="Git repository url",
+            help='Git repository url',
         )
         parser_add_tenant.add_argument(
-            "--name",
+            '--name',
             required=True,
             type=str,
-            help="Name tenant",
+            help='Name tenant',
         )
 
     def _system(parser):
-        parser_system = parser.add_parser("system", help="Manage neulabs system")
-        subparsers = parser_system.add_subparsers(help="Help for command", dest="type")
+        parser_system = parser.add_parser(
+            'system', help='Manage neulabs system')
+        subparsers = parser_system.add_subparsers(
+            help='Help for command', dest='type')
 
-        parser_self_system = subparsers.add_parser("self-install", help="Auto-install neulabs")
+        parser_self_system = subparsers.add_parser(
+            'self-install', help='Auto-install neulabs')
         parser_self_system.add_argument(
-            "--branch",
-            default="main",
+            '--branch',
+            default='main',
             type=str,
-            help=f"Branch/Tag version of workstation-setup [{GITHUB_REPO_URL}]",
+            help=f'Branch/Tag version of workstation-setup [{GITHUB_REPO_URL}]',
         )
 
-        parser_depends_system = subparsers.add_parser("dependencies-install", help="Install third part dependicies")
+        parser_depends_system = subparsers.add_parser(
+            'dependencies-install', help='Install third part dependicies')
         dependencies.argsinstance(parser_depends_system)
 
-        parser_info_system = subparsers.add_parser("info", help="Show neulabs info")
+        parser_info_system = subparsers.add_parser(
+            'info', help='Show neulabs info')
         parser_info_system.add_argument(
-            "info",
+            'info',
             default=False,
-            action="store_true",
-            help="Show WS and Aziona info",
+            action='store_true',
+            help='Show WS and Aziona info',
         )
 
     def _workspace(parser):
-        parser_workspace = parser.add_parser("workspace", help="Manage workspace")
+        parser_workspace = parser.add_parser(
+            'workspace', help='Manage workspace')
         workspace.argsinstance(parser_workspace)
 
     def _kube(parser):
-        parser_workspace = parser.add_parser("kube", help="Kube action for neulabs cluster")
+        parser_workspace = parser.add_parser(
+            'kube', help='Kube action for neulabs cluster')
         kube.argsinstance(parser_workspace)
 
     def _aws(parser):
-        parser_aws = parser.add_parser("aws", help="Aws action")
+        parser_aws = parser.add_parser('aws', help='Aws action')
         aws.argsinstance(parser_aws)
 
     def _infrastructure(parser):
-        parser__infrastructure = parser.add_parser("infra", help="Aws action")
+        parser__infrastructure = parser.add_parser('infra', help='Aws action')
         infrastructure.argsinstance(parser__infrastructure)
-    
+
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(help="Help for command", dest="command")
- 
+    subparsers = parser.add_subparsers(help='Help for command', dest='command')
+
     _terraform(subparsers)
     _tenant(subparsers)
     _system(subparsers)
@@ -137,143 +164,171 @@ def argsinstance():
     return parser
 
 
-
 def cmd_system(args):
     def print_info():
         def print_title(title):
-            print("+---")
-            print(f"| {title.title()}")
-            print("+---")
+            print('+---')
+            print(f'| {title.title()}')
+            print('+---')
+
         def print_element(name, installed_at, path):
-            print(f"| - Name: {name}")
-            print(f"|   Installed at: {installed_at}")
-            print(f"|   Dir path: {path}")
-            print(f"| ")
+            print(f'| - Name: {name}')
+            print(f'|   Installed at: {installed_at}')
+            print(f'|   Dir path: {path}')
+            print(f'| ')
 
         from datetime import datetime
-        print_title("Neulabs devops suite (v" + os.getenv("NEULABS_DEVOPS_SUITE_VERSION", "n.d") +")")
+        print_title(
+            f'Neulabs devops suite (v{os.getenv("NEULABS_DEVOPS_SUITE_VERSION")}')
 
-        print_title("neulabs bin")
+        print_title('neulabs bin')
         for name in os.listdir(os.getenv('NEULABS_BIN_PATH')):
             path = os.path.join(os.getenv('NEULABS_BIN_PATH'), name)
-            installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
+            installed_at = datetime.fromtimestamp(
+                os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
             print_element(name, installed_at, path)
 
-        print_title("neulabs modules")
+        print_title('neulabs modules')
         for name in os.listdir(os.getenv('AZIONA_TERRAFORM_MODULES_PATH')):
-            path = os.path.join(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), name)
-            installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
+            path = os.path.join(
+                os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), name)
+            installed_at = datetime.fromtimestamp(
+                os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
             print_element(name, installed_at, path)
 
-        print_title("tenant settings")
+        print_title('tenant settings')
         for name in os.listdir(os.getenv('NEULABS_TENANT_PATH')):
             path = os.path.join(os.getenv('NEULABS_TENANT_PATH'), name)
-            installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
+            installed_at = datetime.fromtimestamp(
+                os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
             print_element(name, installed_at, path)
 
-    if args.type == "info":
+    if args.type == 'info':
         print_info()
 
-    if args.type == "dependencies-install":
+    if args.type == 'dependencies-install':
         dependencies.main(args)
 
-    if args.type == "self-install":
+    if args.type == 'self-install':
         import tempfile
         tmp_dir = tempfile.TemporaryDirectory()
-        subprocess.check_call(f"curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/{args.branch}/install.sh | bash", shell=True)
+        subprocess.check_call(
+            f'curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/{args.branch}/install.sh | bash', shell=True)
         tmp_dir.cleanup()
 
+
 def cmd_tenant(args):
-    if args.type == "active":
+    if args.type == 'active':
         setenv.main(args)
-        
-    if args.type == "add":
-        name = args.name if args.name else args.url.split("/")[-1].replace(".git", "")
+
+    if args.type == 'add':
+        name = args.name if args.name else args.url.split(
+            '/')[-1].replace('.git', '')
         tenant_path = pathlib.Path(os.getenv('NEULABS_TENANT_PATH'), name)
         if os.path.isdir(tenant_path):
-            print(f"TF module {tenant_path} already exist. Use 'neulabs tenant update'")
+            print(
+                f"TF module {tenant_path} already exist. Use 'neulabs tenant update'")
         else:
             subprocess.check_call(f"cd {os.getenv('NEULABS_TENANT_PATH')} \
                 && git clone {args.url} {name}", shell=True)
 
-    if args.type == "update":
+    if args.type == 'update':
         for module in args.name:
-            tenant_path = os.path.join(os.getenv('NEULABS_TENANT_PATH'), module)
+            tenant_path = os.path.join(
+                os.getenv('NEULABS_TENANT_PATH'), module)
             if not os.path.isdir(tenant_path):
-                print(f"Tenant {tenant_path} not exist. Use 'neulabs tenant add'")
+                print(
+                    f"Tenant {tenant_path} not exist. Use 'neulabs tenant add'")
             else:
-                subprocess.check_call(f"cd {tenant_path} && git pull", shell=True)
+                subprocess.check_call(
+                    f'cd {tenant_path} && git pull', shell=True)
 
-    if args.type == "rm":
+    if args.type == 'rm':
         for module in args.name:
-            tenant_path = pathlib.Path(os.getenv('NEULABS_TENANT_PATH'), module)
+            tenant_path = pathlib.Path(
+                os.getenv('NEULABS_TENANT_PATH'), module)
             if not os.path.isdir(tenant_path):
-                print(f"Tenant {tenant_path} not exist.")
+                print(f'Tenant {tenant_path} not exist.')
             else:
-                subprocess.check_call(f"cd {os.getenv('NEULABS_TENANT_PATH')} && rm -Rf {module}", shell=True)
+                subprocess.check_call(
+                    f"cd {os.getenv('NEULABS_TENANT_PATH')} && rm -Rf {module}", shell=True)
+
 
 def cmd_terraform(args):
-    if args.type == "update":
+    if args.type == 'update':
         for module in args.name:
-            tf_path = pathlib.Path(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), module)
+            tf_path = pathlib.Path(
+                os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), module)
             if not os.path.isdir(tf_path):
-                print(f"Terraform module {tf_path} not exist. Use 'neulabs terraform add'")
+                print(
+                    f"Terraform module {tf_path} not exist. Use 'neulabs terraform add'")
             else:
-                subprocess.check_call(f"cd {tf_path} && git pull && touch {tf_path}", shell=True)
+                subprocess.check_call(
+                    f'cd {tf_path} && git pull && touch {tf_path}', shell=True)
 
-    if args.type == "add":
-        name = args.name if args.name else args.url.split("/")[-1].replace(".git", "")
-        tf_path = pathlib.Path(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), name)
+    if args.type == 'add':
+        name = args.name if args.name else args.url.split(
+            '/')[-1].replace('.git', '')
+        tf_path = pathlib.Path(
+            os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), name)
         if os.path.isdir(tf_path):
-            print(f"Terraform module {tf_path} already exist. Use 'neulabs terraform update'")
+            print(
+                f"Terraform module {tf_path} already exist. Use 'neulabs terraform update'")
         else:
             subprocess.check_call(f"cd {os.getenv('AZIONA_TERRAFORM_MODULES_PATH')} \
                 && git clone {args.url} {name}", shell=True)
 
-    if args.type == "rm":
+    if args.type == 'rm':
         for module in args.name:
-            tf_path = pathlib.Path(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), module)
+            tf_path = pathlib.Path(
+                os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), module)
             if not os.path.isdir(tf_path):
-                print(f"Terraform module {tf_path} not exist.")
+                print(f'Terraform module {tf_path} not exist.')
             else:
-                subprocess.check_call(f"cd {os.getenv('AZIONA_TERRAFORM_MODULES_PATH')} && rm -Rf {module}", shell=True)
+                subprocess.check_call(
+                    f"cd {os.getenv('AZIONA_TERRAFORM_MODULES_PATH')} && rm -Rf {module}", shell=True)
+
 
 def cmd_workspace(args):
     workspace.main(args)
 
+
 def cmd_kube(args):
     kube.main(args)
+
 
 def cmd_aws(args):
     aws.main(args)
 
+
 def cmd_infrastructure(args):
     infrastructure.main(args)
+
 
 def main():
     args = argsinstance().parse_args()
 
-    if args.command == "system":
+    if args.command == 'system':
         cmd_system(args)
 
-    if args.command == "tenant":
+    if args.command == 'tenant':
         cmd_tenant(args)
 
-    if args.command == "terraform":
+    if args.command == 'terraform':
         cmd_terraform(args)
 
-    if args.command == "workspace":
+    if args.command == 'workspace':
         cmd_workspace(args)
 
-    if args.command == "kube":
+    if args.command == 'kube':
         cmd_kube(args)
 
-    if args.command == "aws":
+    if args.command == 'aws':
         cmd_aws(args)
 
-    if args.command == "infra":
+    if args.command == 'infra':
         cmd_infrastructure(args)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())

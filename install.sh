@@ -25,7 +25,7 @@ main(){
     git clone https://github.com/neulabscom/neulabs-devops-suite.git ${TMP_DIRPATH}
 
     cd ${TMP_DIRPATH}
-    
+
     chmod +x -R scripts bin
     python3 scripts/setup.py
 

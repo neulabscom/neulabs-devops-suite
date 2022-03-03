@@ -1,30 +1,34 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
 import argparse
-import sys
 import os
 import pathlib
 import shutil
+import sys
+
 
 def argsinstance():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--sync",
-        action="store_true",
+        '--sync',
+        action='store_true',
         default=False,
-        help="Sync bin folder",
+        help='Sync bin folder',
     )
     return parser
 
+
 def rsync(dirpath):
-    print("Sync folder")
+    print('Sync folder')
     for file_name in os.listdir(dirpath):
         path = pathlib.Path(dirpath, file_name)
         if os.path.isdir(path):
             shutil.rmtree(path)
         if os.path.isfile(path):
             os.remove(path)
-        print(f"Remove {path}")
+        print(f'Remove {path}')
+
 
 def copy(source_dirpath, dest_dirpath):
     for file_name in os.listdir(source_dirpath):
@@ -32,12 +36,13 @@ def copy(source_dirpath, dest_dirpath):
         destination = pathlib.Path(dest_dirpath, file_name)
         if os.path.isfile(source):
             shutil.copy(source, destination)
-            print(f"Copied {file_name} in {destination}")
+            print(f'Copied {file_name} in {destination}')
 
-def exec(dest_dirpath, source_dirpath, sync = False):
+
+def exec(dest_dirpath, source_dirpath, sync=False):
     if not os.path.isdir(dest_dirpath):
-        raise Exception(f"{dest_dirpath} not found")
-    
+        raise Exception(f'{dest_dirpath} not found')
+
     if sync:
         rsync(dest_dirpath)
 
@@ -48,17 +53,22 @@ def main():
     try:
         args = argsinstance().parse_args()
         exec(
-            dest_dirpath=os.getenv("NEULABS_MODULES_PATH", pathlib.Path(os.getenv("HOME"), ".neulabs", "modules")),
-            source_dirpath=pathlib.Path(pathlib.Path(__file__).parent.resolve(), "..", "modules"),
+            dest_dirpath=os.getenv('NEULABS_MODULES_PATH', pathlib.Path(
+                os.getenv('HOME'), '.neulabs', 'modules')),
+            source_dirpath=pathlib.Path(pathlib.Path(
+                __file__).parent.resolve(), '..', 'modules'),
             sync=args.sync
         )
         exec(
-            dest_dirpath=os.getenv("NEULABS_BIN_PATH", pathlib.Path(os.getenv("HOME"), ".neulabs", "bin")),
-            source_dirpath=pathlib.Path(pathlib.Path(__file__).parent.resolve(), "..", "bin"),
+            dest_dirpath=os.getenv('NEULABS_BIN_PATH', pathlib.Path(
+                os.getenv('HOME'), '.neulabs', 'bin')),
+            source_dirpath=pathlib.Path(pathlib.Path(
+                __file__).parent.resolve(), '..', 'bin'),
             sync=args.sync
         )
-    except KeyboardInterrupt as e:
-        pass
+    except KeyboardInterrupt:
+        return 0
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     sys.exit(main())
