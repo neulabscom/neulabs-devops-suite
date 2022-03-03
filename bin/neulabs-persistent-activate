@@ -7,7 +7,7 @@ if [ "${BASH_SOURCE-}" = "$0" ]; then
     exit 33
 fi
 
-neulabs-env "$@" --persistent-active
+neulabs tenant active "$@" --persistent-active
 
 if [ -n "$ZSH_VERSION" ]; then
     source ~/.zshrc

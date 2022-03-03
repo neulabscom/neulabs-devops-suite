@@ -130,13 +130,12 @@ def persistent_deactivate():
     return 0
 
 def persistent_activate():
-    path = os.getenv("NEULABS_ACTIVE_PERSISTENT_PATH")
-    if os.path.isfile(path):
-        os.remove(path)
-
-    return path 
+    persistent_deactivate()
+    return os.getenv("NEULABS_ACTIVE_PERSISTENT_PATH")
 
 def activate():
+    persistent_deactivate()
+    
     path = os.getenv("NEULABS_ACTIVE_PATH")
     if os.path.isfile(path):
         os.remove(path)
