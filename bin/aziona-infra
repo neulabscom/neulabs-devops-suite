@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import pathlib
 import sys
 import argparse
 import os
@@ -33,7 +34,7 @@ def main():
         
     args = argsinstance().parse_args()
 
-    template = os.getenv("AZIONA_WORKSPACE_INFRASTRUCTURE") + "/template/" + args.template + ".yml"
+    template = pathlib.Path(os.getenv("PROJECT_INFRASTRUCTURE"), "template", args.template + ".yml")
 
     command = "aziona -v -f %s %s" % (template," ".join(args.targets))
 

@@ -204,7 +204,6 @@ def main():
         kube_cert(os.getenv("EKS_CLUSTER_NAME"), os.getenv("EKS_AWS_REGION"), os.getenv("KUBECONFIG"), args.aws_profile)
 
     global EXPORT
-    EXPORT += "source " + os.getenv("AZIONA_WORKSPACE_AZIONACLI")  + "/venv/bin/activate > /dev/null 2>&1\n"
     EXPORT += f"echo 'Aziona - env active: {args.env}'\n" 
 
     with open(args.active_path, "w") as f:

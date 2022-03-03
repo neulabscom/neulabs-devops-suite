@@ -28,8 +28,7 @@ ENV = {
     "NEULABS_WORKSPACE": NEULABS_WORKSPACE,
     "AZIONA_PATH": AZIONA_PATH,
     "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(AZIONA_PATH, "terraform-modules"),
-    "AZIONA_WORKSPACE_INFRASTRUCTURE": pathlib.Path(AZIONA_WORKSPACE, "infrastructure"),
-    "AZIONA_WORKSPACE_AZIONACLI": pathlib.Path(AZIONA_WORKSPACE, "aziona-cli")
+    "PROJECT_INFRASTRUCTURE": pathlib.Path(AZIONA_WORKSPACE, "infrastructure")
 }
 
 RC = """
