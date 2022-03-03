@@ -39,9 +39,9 @@ main(){
 
     python3 scripts/bin.py --sync
 
-    neulabs-dependencies
+    neulabs system dependencies-install
 
-    neulabs-projects --yes --filename .projects-base.yml
+    neulabs workspace --yes --filename .projects-base.yml
 }
 
 main "$@"

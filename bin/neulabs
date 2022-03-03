@@ -7,7 +7,7 @@ import os
 import subprocess
 
 sys.path.insert(1, "/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules")#os.getenv("NEULABS_MODULES_PATH"))
-import workspace, setenv
+import workspace, setenv, dependencies
 
 GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
 
@@ -84,20 +84,24 @@ def argsinstance():
             help="Name tenant",
         )
 
-    def _neulabs(parser):
-        parser_neulbas = parser.add_parser("system", help="Manage neulabs system")
-        subparsers = parser_neulbas.add_subparsers(help="Help for command", dest="type")
+    def _system(parser):
+        parser_system = parser.add_parser("system", help="Manage neulabs system")
+        subparsers = parser_system.add_subparsers(help="Help for command", dest="type")
 
-        parser_bin_neulabs = subparsers.add_parser("update", help="Update neulabs system")
-        parser_bin_neulabs.add_argument(
+        parser_self_system = subparsers.add_parser("self-install", help="Auto-install neulabs")
+        parser_self_system.add_argument(
             "--branch",
             default="main",
             type=str,
             help=f"Branch/Tag version of workstation-setup [{GITHUB_REPO_URL}]",
         )
 
-        parser_info_neulabs = subparsers.add_parser("info", help="Print neulabs info")
-        parser_info_neulabs.add_argument(
+        parser_depends_system = subparsers.add_parser("dependencies-install", help="Install third part dependicies")
+        dependencies.argsinstance(parser_depends_system)
+
+
+        parser_info_system = subparsers.add_parser("info", help="Show neulabs info")
+        parser_info_system.add_argument(
             "info",
             default=False,
             action="store_true",
@@ -113,59 +117,53 @@ def argsinstance():
  
     _terraform(subparsers)
     _tenant(subparsers)
-    _neulabs(subparsers)
+    _system(subparsers)
     _workspace(subparsers)
 
     return parser
 
 
-def print_info():
-    from datetime import datetime
-    print("| WORKSTATION VERSION")
-    print("+---")
-    print("| Version: " + os.getenv("NEULABS_DEVOPS_SUITE_VERSION", "n.d"))
-    print(f"| ")
 
-    print("+---")
-    print("| NEULABS BIN")
-    print("+---")
-    for bin in os.listdir(os.getenv('NEULABS_BIN_PATH')):
-        path = os.path.join(os.getenv('NEULABS_BIN_PATH'), bin)
-        installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
-        print(f"| Name: {bin}")
-        print(f"| Installed at: {installed_at}")
-        print(f"| Dir path: {path}")
-        print(f"| ")
+def cmd_system(args):
+    def print_info():
+        def print_title(title):
+            print("+---")
+            print(f"| {title.title()}")
+            print("+---")
+        def print_element(name, installed_at, path):
+            print(f"| - Name: {name}")
+            print(f"|   Installed at: {installed_at}")
+            print(f"|   Dir path: {path}")
+            print(f"| ")
 
-    print("+---")
-    print("| TERRAFORM MODULES")
-    print("+---")
-    for module in os.listdir(os.getenv('AZIONA_TERRAFORM_MODULES_PATH')):
-        path = os.path.join(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), module)
-        installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
-        print(f"| Name: {module}")
-        print(f"| Installed at: {installed_at}")
-        print(f"| Dir path: {path}")
-        print(f"| ")
-    print("+---")
+        from datetime import datetime
+        print_title("Neulabs devops suite (v" + os.getenv("NEULABS_DEVOPS_SUITE_VERSION", "n.d") +")")
 
-    print("+---")
-    print("| TENANT SETTINGS")
-    print("+---")
-    for module in os.listdir(os.getenv('NEULABS_TENANT_PATH')):
-        path = os.path.join(os.getenv('NEULABS_TENANT_PATH'), module)
-        installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
-        print(f"| Name: {module}")
-        print(f"| Installed at: {installed_at}")
-        print(f"| Dir path: {path}")
-        print(f"| ")
-    print("+---") 
+        print_title("neulabs bin")
+        for name in os.listdir(os.getenv('NEULABS_BIN_PATH')):
+            path = os.path.join(os.getenv('NEULABS_BIN_PATH'), name)
+            installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
+            print_element(name, installed_at, path)
 
-def cmd_neulabs(args):
+        print_title("neulabs modules")
+        for name in os.listdir(os.getenv('AZIONA_TERRAFORM_MODULES_PATH')):
+            path = os.path.join(os.getenv('AZIONA_TERRAFORM_MODULES_PATH'), name)
+            installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
+            print_element(name, installed_at, path)
+
+        print_title("tenant settings")
+        for name in os.listdir(os.getenv('NEULABS_TENANT_PATH')):
+            path = os.path.join(os.getenv('NEULABS_TENANT_PATH'), name)
+            installed_at = datetime.fromtimestamp(os.path.getctime(path)).strftime('%Y-%m-%d %H:%M:%S')
+            print_element(name, installed_at, path)
+
     if args.type == "info":
         print_info()
 
-    if args.type == "update":
+    if args.type == "dependencies-install":
+        dependencies.main(args)
+
+    if args.type == "self-install":
         import tempfile
         tmp_dir = tempfile.TemporaryDirectory()
         subprocess.check_call(f"curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/{args.branch}/install.sh | bash", shell=True)
@@ -232,8 +230,8 @@ def cmd_workspace(args):
 def main():
     args = argsinstance().parse_args()
 
-    if args.command == "neulabs":
-        cmd_neulabs(args)
+    if args.command == "system":
+        cmd_system(args)
 
     if args.command == "tenant":
         cmd_tenant(args)

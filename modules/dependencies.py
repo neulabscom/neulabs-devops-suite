@@ -151,9 +151,10 @@ DEPS = {
     }
 }
 
+def argsinstance(parser = None):
+    if parser is None:
+        parser = argparse.ArgumentParser()
 
-def argsinstance():
-    parser = argparse.ArgumentParser()
     parser.add_argument(
         "-y", "--yes",
         action="store_true",
@@ -228,9 +229,10 @@ def exec(distro:str, force_install:bool = False, skip: list = []):
             subprocess.check_call(cmd, shell=True)
 
 
-def main():
+def main(args = None):
     try:
-        args = argsinstance().parse_args()
+        if args is None:
+            args = argsinstance().parse_args()
         
         if platform.system() == "Linux":
             linux(args)
