@@ -5,12 +5,44 @@ import subprocess
 import sys
 from shutil import which
 from distutils.version import LooseVersion
-
-PYTHON_VERSION = LooseVersion(platform.python_version())
-if PYTHON_VERSION < "3.6":
-    raise RuntimeError("PY Version required >= 3.8")
+import argparse
 
 DEPS = {
+    "wget": {
+        "version": None,
+        "install": {
+            "ubuntu": ("sudo apt-get install -y wget",),
+            "darwin": ("brew install wget", ),
+        }
+    },
+    "git": {
+        "version": None,
+        "install": {
+            "ubuntu": ("sudo apt-get install -y git",),
+            "darwin": ("brew install git", ),
+        }
+    },
+    "make": {
+        "version": None,
+        "install": {
+            "ubuntu": ("sudo apt-get install -y make",),
+            "darwin": ("brew install make", ),
+        }
+    },
+    "docker": {
+        "version": None,
+        "install": {
+            "ubuntu": (
+                "sudo apt-get update",
+                "sudo apt-get install ca-certificates gnupg lsb-release",
+                "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+                'sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"',
+                "sudo apt-get update",
+                "sudo apt-get install -y docker-ce docker-ce-cli containerd.io"
+            ),
+            "darwin": (),
+        }
+    },
     "terraform": {
        "version": LooseVersion("1.1.0"),
        "install": {
@@ -32,9 +64,11 @@ DEPS = {
             "curl -LO https://storage.googleapis.com/kubernetes-release/release/v%version%/bin/linux/amd64/kubectl",
             "chmod +x ./kubectl",
             "sudo mv ./kubectl /usr/local/bin/kubectl",
+            "pip3 install kubernetes"
         ),
         "darwin": (
             "brew install kubectl@%version%",
+            "pip3 install kubernetes"
         ),
        },
     },
@@ -66,10 +100,11 @@ DEPS = {
        "version": LooseVersion("2"),
        "install": {
         "ubuntu": (
+            "cd /tmp"
             'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"',
             "unzip awscliv2.zip",
             "sudo ./aws/install",
-            "rm ./aws/install",
+            "rm ./aws/install"
         ),
         "darwin": (
             'curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"',
@@ -88,24 +123,34 @@ DEPS = {
         "darwin": ("brew install aws-iam-authenticator",),
        },
     },
-    "jq": {
-       "version": None,
-       "install": {
-        "ubuntu": ("sudo apt-get install -y jq",),
-        "darwin": ("brew install jq",),
-       },
-    },
     "aziona": {
        "version": LooseVersion("0.1"),
        "install": {
         "ubuntu": ("pip3 install aziona==%version%",),
         "darwin": ("pip3 install aziona==%version%",),
        },
+    },
+    "gh": {
+        "version": None,
+        "install": {
+            "ubuntu": (
+                "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg",
+                'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null',
+                "sudo apt update",
+                "sudo apt-get install -y gh",
+            ),
+            "darwin": ("brew install gh", ),
+        }
+    },
+    "jq": {
+        "version": None,
+        "install": {
+            "ubuntu": ("sudo apt-get install -y jq",),
+            "darwin": ("brew install jq", ),
+        }
     }
 }
 
-
-import argparse
 
 def argsinstance():
     parser = argparse.ArgumentParser()
@@ -149,31 +194,16 @@ def linux(args):
         print("Version: %s" % dist.get("VERSION", "").lower())
         return dist["NAME"].lower()
 
-
-    if platform.system() != "Linux":
-        return
-
     dist = get_distribution()
 
-    if "ubuntu" in dist.lower():
-        exec(distro="ubuntu", force_install=args.force, skip=args.skip)
+    if "ubuntu" not in dist.lower():
+        raise RuntimeError("Distribution not supported. Use MacOS or Ubuntu")
 
-    if "alpine" in dist.lower():
-        exec(distro="alpine", force_install=args.force, skip=args.skip)
+    exec(distro="ubuntu", force_install=args.force, skip=args.skip)
 
 
 def darwin(args):
-    if platform.system() != "Darwin":
-        return
-
     exec(distro="darwin", force_install=args.force, skip=args.skip)
-
-
-def windows():
-    if platform.system() != "Windows":
-        return
-    raise RuntimeError("Install Unix o Linux os")
-
 
 def exec(distro:str, force_install:bool = False, skip: list = []):
     if distro not in ("darwin", "ubuntu", "alpine"):
@@ -191,7 +221,7 @@ def exec(distro:str, force_install:bool = False, skip: list = []):
         print(f"+ Package: {key}")
         print(f"  Version: {data['version']}")
 
-        for cmd in data["install"][distro]:
+        for cmd in data["install"].get(distro, []):
             if data["version"]:
                 cmd = cmd.replace("%version%", str(data["version"]))
             
@@ -201,9 +231,16 @@ def exec(distro:str, force_install:bool = False, skip: list = []):
 def main():
     try:
         args = argsinstance().parse_args()
-        linux(args)
-        darwin(args)
-        windows()
+        
+        if platform.system() == "Linux":
+            linux(args)
+
+        if platform.system() == "Darwin":
+            darwin(args)
+        
+        if platform.system() == "Windows":
+            raise RuntimeError("Distribution not supported. Use MacOS or Ubuntu")
+
     except KeyboardInterrupt as e:
         pass
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from distutils.version import LooseVersion
 import platform
 import sys
 import os
@@ -25,6 +26,7 @@ ENV = {
     "NEULABS_BIN_PATH": os.path.join(NEULABS_PATH, "bin"),
     "NEULABS_TENANT_PATH": os.path.join(NEULABS_PATH, "tenant"),
     "NEULABS_WORKSPACE": NEULABS_WORKSPACE,
+    "AZIONA_PATH": AZIONA_PATH,
     "AZIONA_TERRAFORM_MODULES_PATH": os.path.join(AZIONA_PATH, "terraform-modules"),
     "AZIONA_WORKSPACE_INFRASTRUCTURE": pathlib.Path(AZIONA_WORKSPACE, "infrastructure"),
     "AZIONA_WORKSPACE_AZIONACLI": pathlib.Path(AZIONA_WORKSPACE, "aziona-cli")
@@ -79,6 +81,10 @@ def _configurations():
 
 def main():
     try:
+        py_version = LooseVersion(platform.python_version())
+        if py_version < "3.6":
+            raise RuntimeError("PY Version required >= 3.8")
+
         _configurations()
     except KeyboardInterrupt as e:
         pass

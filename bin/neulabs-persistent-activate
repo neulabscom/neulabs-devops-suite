@@ -7,6 +7,12 @@ if [ "${BASH_SOURCE-}" = "$0" ]; then
     exit 33
 fi
 
-aziona-env "$@"
+neulabs-env "$@" --persistent-active
 
-source ${NEULABS_ACTIVE_PATH:-"/tmp/.neulabs_active"}
+if [ -n "$ZSH_VERSION" ]; then
+    source ~/.zshrc
+elif [ -n "$BASH_VERSION" ]; then
+    source ~/.bashrc
+else
+   echo "Unsupported shell, only bash or zsh"
+fi

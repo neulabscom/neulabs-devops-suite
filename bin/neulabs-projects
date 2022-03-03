@@ -7,24 +7,31 @@ import os
 import subprocess
 import argparse
 
-AZIONA_PATH = os.getenv("AZIONA_PATH")
-NEULABS_PATH = os.getenv("NEULABS_PATH")
-PROJECTS_FILEPATH = os.getenv("NEULABS_WORKSPACE", None)
-if not (PROJECTS_FILEPATH or NEULABS_PATH):
-    raise Exception("Neulabs env not found")
+AZIONA_PATH = os.getenv("AZIONA_PATH", None)
+if not AZIONA_PATH:
+    raise Exception("AZIONA_PATH not found in env. Configure neulabs env")
 
-PROJECTS_DEFINATION_FILENAME = pathlib.Path(NEULABS_PATH, ".projects.yml")
-PROJECTS_VS_EXTENSIONS_FILENAME = pathlib.Path(".vscode", "extensions.json")
-PROJECTS_VS_SETTINGS_FILENAME = pathlib.Path(".vscode", "settings.json")
-PROJECTS_VS_WORKSPACE_FILENAME = "projects.code-workspace"
-WORKSPACE_EXCLUDE = ( PROJECTS_VS_WORKSPACE_FILENAME, "default", ".vscode" )
+NEULABS_PATH = os.getenv("NEULABS_PATH", None)
+if not NEULABS_PATH:
+    raise Exception("NEULABS_PATH not found in env. Configure neulabs env")
+
+NEULABS_WORKSPACE = os.getenv("NEULABS_WORKSPACE", None)
+if not NEULABS_WORKSPACE:
+    raise Exception("NEULABS_WORKSPACE not found in env. Configure neulabs env")
+
+# WORKSPACE VARS
+WS_CONFIGURATION_FILEPATH = pathlib.Path(NEULABS_PATH, ".projects.yml")
+WS_VSCODE_EXTENSIONS_FILEPATH = pathlib.Path(NEULABS_WORKSPACE, ".vscode", "extensions.json")
+WS_VSCODE_SETTINGS_FILEPATH = pathlib.Path(NEULABS_WORKSPACE, ".vscode", "settings.json")
+WS_VSCODE_WORKSPACE_FILEPATH = pathlib.Path(NEULABS_WORKSPACE, "projects.code-workspace")
+WS_EXCLUDE = ( "projects.code-workspace", ".vscode" )
 
 def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-f",
         "--filename",
-        default=PROJECTS_DEFINATION_FILENAME,
+        default=WS_CONFIGURATION_FILEPATH,
         type=str,
         help="Name of the file containing the structure of the projects folder",
     )
@@ -43,7 +50,7 @@ def argparser():
     return parser
 
 def add_project(workspace, project, url):
-        path = pathlib.Path(PROJECTS_FILEPATH, workspace, project)
+        path = pathlib.Path(NEULABS_WORKSPACE, workspace, project)
         if not os.path.isdir(path):
             cmd = f"git clone {url} {path}"
             subprocess.check_call(cmd, shell=True)
@@ -52,7 +59,7 @@ def add_project(workspace, project, url):
             print(f"[ERROR] Add {project} in {path}")
 
 def remove_workspace(workspace):
-    path = pathlib.Path(PROJECTS_FILEPATH, workspace)
+    path = pathlib.Path(NEULABS_WORKSPACE, workspace)
     if os.path.isdir(path):
         subprocess.check_call(f"rm -rf {path}", shell=True)
         print(f"[SUCCESS] Remove {workspace} in {path}")
@@ -60,7 +67,7 @@ def remove_workspace(workspace):
         print(f"[ERROR] Remove {workspace} in {path}")
 
 def remove_project(workspace, project):
-    path = pathlib.Path(PROJECTS_FILEPATH, workspace, project)
+    path = pathlib.Path(NEULABS_WORKSPACE, workspace, project)
     if os.path.isdir(path):
         subprocess.check_call(f"rm -rf {path}", shell=True)
         print(f"[SUCCESS] Remove {project} in {path}")
@@ -69,7 +76,7 @@ def remove_project(workspace, project):
 
 def create_vs_workspace(file_parsed):
     import json
-    os.makedirs(pathlib.Path(PROJECTS_FILEPATH, ".vscode"),exist_ok=True)
+    os.makedirs(pathlib.Path(NEULABS_WORKSPACE, ".vscode"),exist_ok=True)
     vs_extensions = {
         "recommendations": [
             "esbenp.prettier-vscode",
@@ -82,11 +89,11 @@ def create_vs_workspace(file_parsed):
             "shakram02.bash-beautify"
         ]
     }
-    with open(pathlib.Path(PROJECTS_FILEPATH, PROJECTS_VS_EXTENSIONS_FILENAME), "w") as f:
+    with open(WS_VSCODE_EXTENSIONS_FILEPATH, "w") as f:
         f.write(json.dumps(vs_extensions))
 
     vs_settins = {}
-    with open(pathlib.Path(PROJECTS_FILEPATH, PROJECTS_VS_SETTINGS_FILENAME), "w") as f:
+    with open(WS_VSCODE_SETTINGS_FILEPATH, "w") as f:
         f.write(json.dumps(vs_settins))
 
     vs_workspace = {
@@ -108,13 +115,13 @@ def create_vs_workspace(file_parsed):
     for workspace, data in file_parsed.items():
         vs_workspace["folders"].append({
             "name": workspace,
-            "path": os.path.join(PROJECTS_FILEPATH, workspace)
+            "path": os.path.join(NEULABS_WORKSPACE, workspace)
         })
-    with open(pathlib.Path(PROJECTS_FILEPATH, PROJECTS_VS_WORKSPACE_FILENAME), "w") as f:
+    with open(WS_VSCODE_WORKSPACE_FILEPATH, "w") as f:
         f.write(json.dumps(vs_workspace))
 
 def create_projects_yml(file_parsed):
-    with open(pathlib.Path(PROJECTS_DEFINATION_FILENAME), "w") as f:
+    with open(pathlib.Path(WS_CONFIGURATION_FILEPATH), "w") as f:
         f.write(yaml.dump(file_parsed))
     
 
@@ -127,8 +134,8 @@ def main() -> bool:
 
         file_parsed = {}
 
-        if args.filename != PROJECTS_DEFINATION_FILENAME:
-            file_parsed.update(**yaml.load(open(PROJECTS_DEFINATION_FILENAME), Loader=yaml.FullLoader))
+        if args.filename != WS_CONFIGURATION_FILEPATH:
+            file_parsed.update(**yaml.load(open(WS_CONFIGURATION_FILEPATH), Loader=yaml.FullLoader))
 
         file_parsed.update(**yaml.load(open(args.filename), Loader=yaml.FullLoader))
 
@@ -138,8 +145,8 @@ def main() -> bool:
         projects_to_remove_workspace = []
 
         existing_workspace = {} 
-        for target in [ w for w in os.listdir(PROJECTS_FILEPATH) if w not in WORKSPACE_EXCLUDE ]:
-            existing_workspace[target] = os.listdir(pathlib.Path(PROJECTS_FILEPATH, target))
+        for target in [ w for w in os.listdir(NEULABS_WORKSPACE) if w not in WS_EXCLUDE ]:
+            existing_workspace[target] = os.listdir(pathlib.Path(NEULABS_WORKSPACE, target))
 
             if target in file_parsed.keys():
                 remove = set(existing_workspace[target]).difference(file_parsed[target])
@@ -148,7 +155,7 @@ def main() -> bool:
             else:
                 projects_to_remove_workspace.append(target)
 
-        for workspace, projects in {w:file_parsed[w] for w in file_parsed.keys() if w not in WORKSPACE_EXCLUDE}.items():
+        for workspace, projects in {w:file_parsed[w] for w in file_parsed.keys() if w not in WS_EXCLUDE}.items():
             add = set(projects).difference(existing_workspace.get(workspace, {}))
             if add:
                 projects_to_add.append((workspace, { k:projects[k] for k in add}))

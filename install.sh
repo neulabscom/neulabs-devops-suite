@@ -37,7 +37,7 @@ main(){
         source ~/.zshrc
     fi
 
-    python3 scripts/bin.py
+    python3 scripts/bin.py --sync
 
     neulabs-dependencies
 

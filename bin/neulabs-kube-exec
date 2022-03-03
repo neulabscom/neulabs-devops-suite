@@ -32,8 +32,8 @@ def argsinstance():
 
 def main():
     try:
-        if os.getenv("AZIONA_ENABLED") != "true":
-            print("[ERROR] Before activate aziona env with: aziona-env")
+        if os.getenv("NEULABS_ENABLED") != "true":
+            print("[ERROR] Before activate neulabs env with: neulabs-activate")
             return 1
 
         print(os.getenv("AZIONA_WELCOME_MESSAGE"))
