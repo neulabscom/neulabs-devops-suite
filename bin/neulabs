@@ -6,8 +6,8 @@ import argparse
 import os
 import subprocess
 
-sys.path.insert(1, os.getenv("NEULABS_MODULES_PATH"))
-import workspace
+sys.path.insert(1, "/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules")#os.getenv("NEULABS_MODULES_PATH"))
+import workspace, setenv
 
 GITHUB_REPO_URL = "https://github.com/neulabscom/neulabs-devops-suite.git"
 
@@ -50,6 +50,10 @@ def argsinstance():
         parser_tenant = parser.add_parser("tenant", help="Manage tenant settings")
         subparsers = parser_tenant.add_subparsers(help="Help for command", dest="type")
 
+
+        parser_setenv = subparsers.add_parser("active", help="Active shell env with tenant settings")
+        setenv.argsinstance(parser_setenv)
+
         parser_update_tenant = subparsers.add_parser("update", help="Manage terraform module")
         parser_update_tenant.add_argument(
             "name",
@@ -81,7 +85,7 @@ def argsinstance():
         )
 
     def _neulabs(parser):
-        parser_neulbas = parser.add_parser("system", help="Manage neulabs env")
+        parser_neulbas = parser.add_parser("system", help="Manage neulabs system")
         subparsers = parser_neulbas.add_subparsers(help="Help for command", dest="type")
 
         parser_bin_neulabs = subparsers.add_parser("update", help="Update neulabs system")
@@ -101,8 +105,8 @@ def argsinstance():
         )
 
     def _workspace(parser):
-        parser_neulbas = parser.add_parser("workspace", help="Manage neulabs env")
-        workspace.argsinstance(parser_neulbas)
+        parser_workspace = parser.add_parser("workspace", help="Manage workspace")
+        workspace.argsinstance(parser_workspace)
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help="Help for command", dest="command")
@@ -168,6 +172,9 @@ def cmd_neulabs(args):
         tmp_dir.cleanup()
 
 def cmd_tenant(args):
+    if args.type == "active":
+        setenv.main(args)
+        
     if args.type == "add":
         name = args.name if args.name else args.url.split("/")[-1].replace(".git", "")
         tenant_path = pathlib.Path(os.getenv('NEULABS_TENANT_PATH'), name)

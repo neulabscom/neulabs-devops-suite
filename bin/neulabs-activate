@@ -7,6 +7,6 @@ if [ "${BASH_SOURCE-}" = "$0" ]; then
     exit 33
 fi
 
-neulabs-env "$@"
+neulabs tenant active "$@"
 
 source ${NEULABS_ACTIVE_PATH:-"/tmp/.neulabs_active"}

@@ -50,6 +50,7 @@ def _configurations():
 
     os.makedirs(f"{ENV['NEULABS_PATH']}", exist_ok=True)
     os.makedirs(f"{ENV['NEULABS_TENANT_PATH']}", exist_ok=True)
+    os.makedirs(f"{ENV['NEULABS_MODULES_PATH']}", exist_ok=True)
     os.makedirs(f"{ENV['NEULABS_BIN_PATH']}", exist_ok=True)
     os.makedirs(f"{ENV['AZIONA_TERRAFORM_MODULES_PATH']}", exist_ok=True)
 
