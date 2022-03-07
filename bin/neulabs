@@ -7,6 +7,8 @@ import pathlib
 import subprocess
 import sys
 
+sys.path.insert(1, os.getenv('NEULABS_MODULES_PATH'))  # noqa
+
 import aws
 import dependencies
 import infrastructure
@@ -14,9 +16,6 @@ import kube
 import setenv
 import workspace
 
-# os.getenv("NEULABS_MODULES_PATH"))
-sys.path.insert(
-    1, '/home/fabrizio/projects/neulabs/neulabs-devops-suite/modules')
 
 GITHUB_REPO_URL = 'https://github.com/neulabscom/neulabs-devops-suite.git'
 
@@ -147,7 +146,8 @@ def argsinstance():
         aws.argsinstance(parser_aws)
 
     def _infrastructure(parser):
-        parser__infrastructure = parser.add_parser('infra', help='Aws action')
+        parser__infrastructure = parser.add_parser(
+            'infra', help='Action manage aziona infrastructure')
         infrastructure.argsinstance(parser__infrastructure)
 
     parser = argparse.ArgumentParser()

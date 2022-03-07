@@ -192,7 +192,7 @@ def main(args=None):
             active_path = activate()
 
         if os.path.isdir(config_path) is False:
-            print('Tenant directory not found: ' + config_path)
+            print('Tenant directory not found: ' + str(config_path))
             print('Download tenant settings')
             git_tenant_url = input('Input git repository url: ')
             subprocess.check_call(
@@ -201,7 +201,7 @@ def main(args=None):
         # file .env tenant
         tenant_path = pathlib.Path(config_path, args.env, '.env')
         if os.path.isfile(tenant_path) is False:
-            raise Exception('Tenant file not exist: ' + tenant_path)
+            raise Exception('Tenant file not exist: ' + str(tenant_path))
 
         # import f  ile .env in os and to ACTIVATE_FILE var
         with open(tenant_path, 'r') as f:
