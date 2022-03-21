@@ -93,13 +93,15 @@ def create_vs_workspace(file_parsed):
     vs_extensions = {
         'recommendations': [
             'esbenp.prettier-vscode',
-            'eamodio.gitlens',
             'leodevbro.blockman',
             'ms-azuretools.vscode-docker',
             'hashicorp.terraform',
             'ms-python.python',
             'redhat.vscode-yaml',
-            'shakram02.bash-beautify'
+            'shakram02.bash-beautify',
+            'hediet.vscode-drawio',
+            'donjayamanne.githistory',
+            'amazonwebservices.aws-toolkit-vscode'
         ]
     }
     with open(WS_VSCODE_EXTENSIONS_FILEPATH, 'w') as f:
