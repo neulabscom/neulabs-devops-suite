@@ -26,7 +26,7 @@ main(){
 
     cd ${TMP_DIRPATH}
 
-    chmod +x -R scripts bin
+    chmod -R +x scripts bin
     python3 scripts/setup.py
 
     if [ -f ~/.bashrc ] ; then
