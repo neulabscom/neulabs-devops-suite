@@ -13,7 +13,8 @@ AZIONA_PATH = pathlib.Path(os.getenv('HOME'), '.aziona')
 NEULABS_PATH = pathlib.Path(os.getenv('HOME'), '.neulabs')
 
 if platform.system() == 'Darwin':
-    NEULABS_WORKSPACE = pathlib.Path(os.getenv('HOME') + 'Documents/projects')
+    NEULABS_WORKSPACE = pathlib.Path(
+        os.getenv('HOME'), 'Documents', 'projects')
 if platform.system() == 'Linux':
     NEULABS_WORKSPACE = pathlib.Path(os.getenv('HOME'), 'projects')
 
