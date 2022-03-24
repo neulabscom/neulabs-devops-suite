@@ -14,7 +14,10 @@ DEPS = {
         'version': None,
         'install': {
             'ubuntu': ('sudo apt-get install -y wget',),
-            'darwin': ('brew install wget', ),
+            'darwin': (
+                'ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"',
+                'brew install wget'
+            ),
         }
     },
     'git': {
@@ -60,7 +63,7 @@ DEPS = {
         },
     },
     'kubectl': {
-        'version': LooseVersion('1.23.0'),
+        'version': LooseVersion('1.22.8'),
         'install': {
             'ubuntu': (
                 'curl -LO https://storage.googleapis.com/kubernetes-release/release/v%version%/bin/linux/amd64/kubectl',
