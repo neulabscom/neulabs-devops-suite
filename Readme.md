@@ -33,6 +33,5 @@ Setup local env
 
     git clone https://github.com/neulabscom/neulabs-devops-suite.git
     cd neulabs-devops-suite
-    chmod +x devmode.sh
-    ./devmode.sh
-    source .venv/bin/active
+    make develop
+    source .activate

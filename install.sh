@@ -27,7 +27,10 @@ main(){
     cd ${TMP_DIRPATH}
 
     chmod -R +x scripts bin
+
     python3 scripts/setup.py
+
+    python3 scripts/shell.py
 
     if [ -f ~/.bashrc ] ; then
         source ~/.bashrc

@@ -69,13 +69,15 @@ def exec_action(args):
             print(f'{index})\tPod: {p.metadata.name} \n\tContainer: {containers}\n')
 
             index += 1
+    del containers
+
     index = int(input('Enter the index of the Pod: '))
     if index > len(pods):
         print(f'Index {index} not found')
         return 1
 
     container = args.container if args.container else input('Container name: ')
-    if container not in containers:
+    if container not in pod_containers[index]:
         print(f'Container {container} not found in pod')
         return 1
 
