@@ -14,10 +14,7 @@ DEPS = {
         'version': None,
         'install': {
             'ubuntu': ('sudo apt-get install -y wget',),
-            'darwin': (
-                'ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"',
-                'brew install wget'
-            ),
+            'darwin': ('brew install wget',),
         }
     },
     'git': {

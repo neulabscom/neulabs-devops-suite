@@ -10,7 +10,9 @@
 4. Utils:
     - bash
     - curl
-5. (Only MacOS) Docker \[[install](https://docs.docker.com/desktop/mac/install/)\]
+5. Only MacOS
+    - Docker \[[install](https://docs.docker.com/desktop/mac/install/)\]
+    - Homebrew
 
 ### Get Started
 
