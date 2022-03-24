@@ -32,6 +32,10 @@ main(){
 
     python3 scripts/shell.py
 
+    python3 scripts/bin.py --sync
+
+    pip3 install -r requirements.txt
+
     if [ -f ~/.bashrc ] ; then
         source ~/.bashrc
     fi
@@ -39,8 +43,6 @@ main(){
     if [ -f ~/.zshrc ] ; then
         source ~/.zshrc
     fi
-
-    python3 scripts/bin.py --sync
 
     neulabs system dependencies-install
 

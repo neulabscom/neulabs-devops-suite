@@ -7,6 +7,11 @@ import pathlib
 import shutil
 import sys
 
+NEULABS_PATH = pathlib.Path(os.getenv('HOME'), '.neulabs')
+
+NEULABS_MODULES_PATH = pathlib.Path(NEULABS_PATH, 'modules')
+NEULABS_BIN_PATH = pathlib.Path(NEULABS_PATH, 'bin')
+
 
 def argsinstance():
     parser = argparse.ArgumentParser()
@@ -53,15 +58,13 @@ def main():
     try:
         args = argsinstance().parse_args()
         exec(
-            dest_dirpath=os.getenv('NEULABS_MODULES_PATH', pathlib.Path(
-                os.getenv('HOME'), '.neulabs', 'modules')),
+            dest_dirpath=NEULABS_MODULES_PATH,
             source_dirpath=pathlib.Path(pathlib.Path(
                 __file__).parent.resolve(), '..', 'modules'),
             sync=args.sync
         )
         exec(
-            dest_dirpath=os.getenv('NEULABS_BIN_PATH', pathlib.Path(
-                os.getenv('HOME'), '.neulabs', 'bin')),
+            dest_dirpath=NEULABS_BIN_PATH,
             source_dirpath=pathlib.Path(pathlib.Path(
                 __file__).parent.resolve(), '..', 'bin'),
             sync=args.sync

@@ -1,2 +1,1 @@
-kubernetes
 pre-commit==2.11.1

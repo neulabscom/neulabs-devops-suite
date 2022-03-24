@@ -9,7 +9,6 @@ import sys
 
 from distutils.version import LooseVersion
 
-AZIONA_PATH = pathlib.Path(os.getenv('HOME'), '.aziona')
 NEULABS_PATH = pathlib.Path(os.getenv('HOME'), '.neulabs')
 
 RC = """
