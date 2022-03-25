@@ -24,7 +24,7 @@
 
     neulabs workspace add --workspace azionaventures --name aziona-cli --url git@github.com:azionaventures/aziona-cli.git
     neulabs workspace add --workspace azionaventures --name infrastructure --url git@github.com:azionaventures/infrastructure.git
-    neulabs workspace add --workspace neulabs --name neulabs-devops-suite --url git@github.com:azionaventures/neulabs-devops-suite.git
+    neulabs workspace add --workspace neulabs --name neulabs-devops-suite --url git@github.com:neulabscom/neulabs-devops-suite.git
 
 ### Usage
 

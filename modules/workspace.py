@@ -187,7 +187,7 @@ def create_vscode_workspace(workspace, project):
         }
 
     vs_workspace['folders'].append({
-        'name': workspace,
+        'name': project,
         'path': str(pathlib.Path(NEULABS_WORKSPACE, workspace, project))
     })
 
