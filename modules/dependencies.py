@@ -90,12 +90,12 @@ DEPS = {
         'version': LooseVersion('0.86.0'),
         'install': {
             'ubuntu': (
-                'curl --location https://github.com/weaveworks/eksctl/releases/download/v%version%/eksctl_Linux_amd64.tar.gz | tar xz -C /tmp',
+                'curl --location https://github.com/weaveworks/eksctl/releases/download/v%version%/eksctl_$(uname -s)_$(dpkg --print-architecture).tar.gz | tar xz -C /tmp',
                 'sudo mv /tmp/eksctl /usr/local/bin',
             ),
             'darwin': (
-                'brew tap weaveworks/tap',
-                'brew install weaveworks/tap/eksctl@%version%'
+                'curl --location https://github.com/weaveworks/eksctl/releases/download/v%version%/eksctl_$(uname -s)_$(uname -m).tar.gz | tar xz -C /tmp',
+                'sudo mv /tmp/eksctl /usr/local/bin',
             ),
         },
     },
