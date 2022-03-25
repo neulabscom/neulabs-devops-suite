@@ -45,17 +45,29 @@ DEPS = {
             'darwin': (),
         }
     },
-    'terraform': {
-        'version': LooseVersion('1.1.0'),
+    'tfenv': {
+        'version': None,
         'install': {
             'ubuntu': (
-                'curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -',
-                'sudo apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"',
-                'sudo apt install -y terraform=%version%',
+                'git clone https://github.com/tfutils/tfenv.git ~/.tfenv',
+                'sudo ln -s ~/.tfenv/bin/* /usr/local/bin'
             ),
             'darwin': (
-                'brew install terraform@%version%',
-                'brew link terraform@%version%'
+                'brew install tfenv',
+            ),
+        },
+
+    },
+    'terraform': {
+        'version': LooseVersion('1.1.7'),
+        'install': {
+            'ubuntu': (
+                'tfenv terraform %version%',
+                'tfenv use %version%'
+            ),
+            'darwin': (
+                'tfenv terraform %version%',
+                'tfenv use %version%'
             ),
         },
     },
