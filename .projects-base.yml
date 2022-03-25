@@ -1,8 +1,0 @@
-# AZIONAVENTURES
-azionaventures:
-  aziona-cli: git@github.com:azionaventures/aziona-cli.git
-  infrastructure: git@github.com:azionaventures/infrastructure.git
-
-# NEULABS
-neulabs:
-  neulabs-devops-suite: git@github.com:neulabscom/neulabs-devops-suite.git

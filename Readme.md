@@ -16,16 +16,15 @@
 
 ### Get Started
 
-Setup local env
-
     curl -o- https://raw.githubusercontent.com/neulabscom/neulabs-devops-suite/main/install.sh | bash
+
+    neulabs system dependencies-install
 
     gh auth login
 
-    mkdir ~/.aws && touch ~/.aws/credentials
-
-    ssh-keygen -t rsa -b 4096 -o -a 100 # (optional)
-
+    neulabs workspace add --workspace azionaventures --name aziona-cli --url git@github.com:azionaventures/aziona-cli.git
+    neulabs workspace add --workspace azionaventures --name infrastructure --url git@github.com:azionaventures/infrastructure.git
+    neulabs workspace add --workspace neulabs --name neulabs-devops-suite --url git@github.com:azionaventures/neulabs-devops-suite.git
 
 ### Usage
 

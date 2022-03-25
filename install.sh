@@ -35,18 +35,6 @@ main(){
     python3 scripts/bin.py --sync
 
     pip3 install -r requirements.txt
-
-    if [ -f ~/.bashrc ] ; then
-        source ~/.bashrc
-    fi
-
-    if [ -f ~/.zshrc ] ; then
-        source ~/.zshrc
-    fi
-
-    neulabs system dependencies-install
-
-    neulabs workspace --yes --filename .projects-base.yml
 }
 
 main "$@"

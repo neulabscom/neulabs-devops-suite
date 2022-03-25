@@ -242,7 +242,12 @@ def exec(distro: str, force_install: bool = False, skip: list = []):
             if data['version']:
                 cmd = cmd.replace('%version%', str(data['version']))
 
-            subprocess.check_call(cmd, shell=True)
+            try:
+                subprocess.check_call(cmd, shell=True)
+            except Exception as e:
+                print(str(e))
+                print('\n!!! Report error to DevOps\n')
+                sys.exit(1)
 
 
 def main(args=None):
@@ -259,7 +264,6 @@ def main(args=None):
         if platform.system() == 'Windows':
             raise RuntimeError(
                 'Distribution not supported. Use MacOS or Ubuntu')
-
     except KeyboardInterrupt:
         return 0
 
