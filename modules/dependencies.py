@@ -87,7 +87,7 @@ DEPS = {
         },
     },
     'eksctl': {
-        'version': LooseVersion('0.67.0'),
+        'version': LooseVersion('0.86.0'),
         'install': {
             'ubuntu': (
                 'curl --location https://github.com/weaveworks/eksctl/releases/download/v%version%/eksctl_Linux_amd64.tar.gz | tar xz -C /tmp',
