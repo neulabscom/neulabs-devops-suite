@@ -94,7 +94,6 @@ DEPS = {
                 'sudo mv /tmp/eksctl /usr/local/bin',
             ),
             'darwin': (
-                '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"',
                 'brew tap weaveworks/tap',
                 'brew install weaveworks/tap/eksctl@%version%'
             ),
