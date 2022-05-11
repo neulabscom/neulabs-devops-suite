@@ -53,11 +53,6 @@ def ecr_login_action(args):
 
 def main(args=None):
     try:
-        if os.getenv('NEULABS_ENABLED') != 'true':
-            print('[ERROR] Before activate neulabs env with: neulabs-activate')
-            return 1
-        print(os.getenv('AZIONA_WELCOME_MESSAGE'))
-
         if args is None:
             args = argsinstance().parse_args()
 
