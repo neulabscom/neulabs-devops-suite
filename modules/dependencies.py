@@ -212,10 +212,12 @@ def linux(args):
 
     dist = get_distribution()
 
-    if 'ubuntu' not in dist.lower():
+    distro = "ubuntu" if dist.lower() == 'pop!_os' else dist.lower()
+    
+    if 'ubuntu' not in distro:
         raise RuntimeError('Distribution not supported. Use MacOS or Ubuntu')
 
-    exec(distro='ubuntu', force_install=args.force, skip=args.skip)
+    exec(distro=distro, force_install=args.force, skip=args.skip)
 
 
 def darwin(args):
