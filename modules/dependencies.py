@@ -10,13 +10,6 @@ from shutil import which
 from distutils.version import LooseVersion
 
 DEPS = {
-    'wget': {
-        'version': None,
-        'install': {
-            'ubuntu': ('sudo apt-get install -y wget',),
-            'darwin': ('brew install wget',),
-        }
-    },
     'git': {
         'version': None,
         'install': {
@@ -72,7 +65,7 @@ DEPS = {
         },
     },
     'kubectl': {
-        'version': LooseVersion('1.22.8'),
+        'version': LooseVersion('1.23.0'),
         'install': {
             'ubuntu': (
                 'curl -LO https://storage.googleapis.com/kubernetes-release/release/v%version%/bin/linux/amd64/kubectl',
@@ -87,7 +80,7 @@ DEPS = {
         },
     },
     'eksctl': {
-        'version': LooseVersion('0.86.0'),
+        'version': LooseVersion('0.97.0'),
         'install': {
             'ubuntu': (
                 'curl --location https://github.com/weaveworks/eksctl/releases/download/v%version%/eksctl_$(uname -s)_$(dpkg --print-architecture).tar.gz | tar xz -C /tmp',
