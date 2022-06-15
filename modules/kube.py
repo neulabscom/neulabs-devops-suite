@@ -55,34 +55,37 @@ def exec_action(args):
         print(e)
         return 1
 
-    pods = []
-    pod_containers = {}
+    pods = {}
     index = 0
     for p in ret.items:
         if p.metadata.name.startswith(args.pod):
             containers = []
             for c in p.metadata.managed_fields[0].fields_v1.get('f:spec', {}).get('f:containers', {}).keys():
                 containers.append(c.split(':')[2][1:-2])
-            pods.append(p.metadata.name)
-            pod_containers[index] = containers
+            
+            pods[p.metadata.name] = containers
 
             print(f'{index})\tPod: {p.metadata.name} \n\tContainer: {containers}\n')
 
             index += 1
-    del containers
+    del index
 
-    index = int(input('Enter the index of the Pod: '))
-    if index > len(pods):
-        print(f'Index {index} not found')
-        return 1
+    if len(pods) == 1:
+        selected = 0
+    else:
+        selected = int(input('Enter the index of the Pod: '))
+        if selected > len(pods):
+            print(f'Index {selected} not found')
+            return 1
 
+    pod_selected = list(pods.keys())[selected]
     container = args.container if args.container else input('Container name: ')
-    if container not in pod_containers[index]:
+    if container not in pods[pod_selected]:
         print(f'Container {container} not found in pod')
         return 1
 
     subprocess.check_call(
-        f'kubectl exec -it {pods[index]} -c {container} -- {args.cmd}', shell=True)
+        f'kubectl exec -it {pod_selected} -c {container} -- {args.cmd}', shell=True)
 
 
 def main(args=None):
